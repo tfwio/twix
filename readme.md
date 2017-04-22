@@ -33,7 +33,7 @@ Its probably worth pointing out that you're probably not going to want to naviga
 - Note that if you would like to compile arpeggio 20170422 (github.com/tfwio/arp), the only 'animation' used renders a little (useless) timing information, so a call to OnTimer in the `class Arpeggio` can be omitted if you don't want to hack iplug as such.
 - Clone this project somewhere to its default name: `twix`
 - Move the cloned directory parallel to `./WDL` in your wdl-ol fork which happens to be parallel to `./VST_SDK`, `VST3_SDK`, etc...
-- Got to Property-Page editor within your respective WDL-OL/IPLUG project.  It's called 'Property Manager' within the IDE.
+- Go to Property-Page editor within your respective WDL-OL/IPLUG project.  It's called 'Property Manager' within the IDE.
     - If the "Property Manager" tab isn't visible within your IDE, then check `View->Other Windows->Property Manager` to make it visible.  If you don't see such options, then you probably have to change some `Tools->Options`-like setting for 'Expert Mode' or some-such.
 - Expand any configuration folder icon (it doesn't matter which one)
 - Right-click your project-name in the configuration...  
@@ -101,6 +101,10 @@ in IRECT, I still hadn't gotten this out of there.  There is probably an equivel
 ```
 static IRECT Create(int x, int y, int w, int h) { return IRECT(x,y,x+w, y+h); }
 ```
+
+----
+
+The only other thing worth mentioning is that I also added some calls to WINDOWS API into the mix for some controls (not in arpeggio) which move the mouse pointer.  I'm not sure how to do this in MAC.  I will clean out anything un-necessary and properly track changes to a patch and/or proper documentation in the fut.
 
 ## LICE test-app?
 

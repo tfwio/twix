@@ -43,7 +43,7 @@ body {
 <li>Note that if you would like to compile arpeggio 20170422 (github.com/tfwio/arp), the only ‘animation’ used renders a little (useless) timing information, so a call to OnTimer in the <code>class Arpeggio</code> can be omitted if you don’t want to hack iplug as such.</li>
 <li>Clone this project somewhere to its default name: <code>twix</code></li>
 <li>Move the cloned directory parallel to <code>./WDL</code> in your wdl-ol fork which happens to be parallel to <code>./VST_SDK</code>, <code>VST3_SDK</code>, etc…</li>
-<li>Got to Property-Page editor within your respective WDL-OL/IPLUG project. It’s called ‘Property Manager’ within the IDE.
+<li>Go to Property-Page editor within your respective WDL-OL/IPLUG project. It’s called ‘Property Manager’ within the IDE.
 <ul>
 <li>If the “Property Manager” tab isn’t visible within your IDE, then check <code>View-&gt;Other Windows-&gt;Property Manager</code> to make it visible. If you don’t see such options, then you probably have to change some <code>Tools-&gt;Options</code>-like setting for ‘Expert Mode’ or some-such.</li>
 </ul></li>
@@ -91,6 +91,8 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 <p><strong>IPlugStructs.h</strong></p>
 <p>in IRECT, I still hadn’t gotten this out of there. There is probably an equivelant somewhere that makes this pointless, though if there is a dependency on this and I didn’t mention it may be rude.</p>
 <pre><code>static IRECT Create(int x, int y, int w, int h) { return IRECT(x,y,x+w, y+h); }</code></pre>
+<hr />
+<p>The only other thing worth mentioning is that I also added some calls to WINDOWS API into the mix for some controls (not in arpeggio) which move the mouse pointer. I’m not sure how to do this in MAC. I will clean out anything un-necessary and properly track changes to a patch and/or proper documentation in the fut.</p>
 <h2 id="lice-test-app">LICE test-app?</h2>
 <p>In <code>WDL/lice/test/test.rc</code>, change the following if you want to compile the lice test-app for Visual Studio Express 2013.</p>
 <pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// replace with windows.h</span>
