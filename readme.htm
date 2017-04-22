@@ -36,10 +36,11 @@ body {
 <p>Its been tested/used in VisualStudio Express 2013 of yet.</p>
 <p>This happens to be a first-draft of this doc, so I’m crossing my fingers that this covers everything.</p>
 <h1 id="why">Why?</h1>
-<p>The only use-case/example is thus far in what is currently up here, called <a href="https://github.com/tfwio/arp">arpeggio</a>. There have been a few changes made to IPlugVST (windows) that have yet to be noted. I’ve documented what I could think of that you might need to change in order to compile the arp project and lice test-app. [well, at least that’s part of the reason as to why ;)]</p>
+<p>The only use-case/example is thus far in what is currently up here, called <a href="https://github.com/tfwio/arp">arpeggio</a>. There have been a few changes made to IPlug (windows) that have yet to be noted. I’ve documented what I could think of that you might need to change in order to compile the arp project and lice test-app. [well, at least that’s part of the reason as to why ;)]</p>
 <p>Its probably worth pointing out that you’re probably not going to want to navigate through the code here except through its use-case as not everything here is used or perhaps working. Its WIP after all.</p>
 <h1 id="usage">Usage</h1>
 <ul>
+<li>Note that if you would like to compile arpeggio 20170422 (github.com/tfwio/arp), the only ‘animation’ used renders a little (useless) timing information, so a call to OnTimer in the <code>class Arpeggio</code> can be omitted if you don’t want to hack iplug as such.</li>
 <li>Clone this project somewhere to its default name: <code>twix</code></li>
 <li>Move the cloned directory parallel to <code>./WDL</code> in your wdl-ol fork which happens to be parallel to <code>./VST_SDK</code>, <code>VST3_SDK</code>, etc…</li>
 <li>Got to Property-Page editor within your respective WDL-OL/IPLUG project. It’s called ‘Property Manager’ within the IDE.

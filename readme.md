@@ -24,12 +24,13 @@ This happens to be a first-draft of this doc, so I'm crossing my fingers that th
 
 # Why?
 
-The only use-case/example is thus far in what is currently up here, called [arpeggio](https://github.com/tfwio/arp).  There have been a few changes made to IPlugVST (windows) that have yet to be noted.  I've documented what I could think of that you might need to change in order to compile the arp project and lice test-app. [well, at least that's part of the reason as to why ;)]
+The only use-case/example is thus far in what is currently up here, called [arpeggio](https://github.com/tfwio/arp).  There have been a few changes made to IPlug (windows) that have yet to be noted.  I've documented what I could think of that you might need to change in order to compile the arp project and lice test-app. [well, at least that's part of the reason as to why ;)]
 
 Its probably worth pointing out that you're probably not going to want to navigate through the code here except through its use-case as not everything here is used or perhaps working.  Its WIP after all.
 
 # Usage
 
+- Note that if you would like to compile arpeggio 20170422 (github.com/tfwio/arp), the only 'animation' used renders a little (useless) timing information, so a call to OnTimer in the `class Arpeggio` can be omitted if you don't want to hack iplug as such.
 - Clone this project somewhere to its default name: `twix`
 - Move the cloned directory parallel to `./WDL` in your wdl-ol fork which happens to be parallel to `./VST_SDK`, `VST3_SDK`, etc...
 - Got to Property-Page editor within your respective WDL-OL/IPLUG project.  It's called 'Property Manager' within the IDE.
