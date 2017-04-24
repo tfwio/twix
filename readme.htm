@@ -26,18 +26,17 @@ body {
 <ul>
 <li><a href="#why">Why?</a></li>
 <li><a href="#usage">Usage</a></li>
-<li><a href="#iplug-hacks">IPlug Hacks</a><ul>
-<li><a href="#lice-test-app">LICE test-app?</a></li>
-</ul></li>
+<li><a href="#iplug-hacks">IPlug Hacks</a></li>
 </ul>
 </nav>
+<blockquote>
+<p>tfw’s wdl/iplug extras — a few tiny classes and iplug controls supporting a particular midi effect/arpeggiator up here and whatever else may pop up over time.</p>
+</blockquote>
 <p>see github.com/olilarkin/wdl-ol</p>
-<p>tom’s wdl/iplug extras — a few iplug controls supporting a particular midi effect/arpeggiator up here.</p>
 <p>Its been tested/used in VisualStudio Express 2013 of yet.</p>
-<p>This happens to be a first-draft of this doc, so I’m crossing my fingers that this covers everything.</p>
 <h1 id="why">Why?</h1>
 <p>The only use-case/example is thus far in what is currently up here, called <a href="https://github.com/tfwio/arp">arpeggio</a>. There have been a few changes made to IPlug (windows) that have yet to be noted. I’ve documented what I could think of that you might need to change in order to compile the arp project and lice test-app. [well, at least that’s part of the reason as to why ;)]</p>
-<p>Its probably worth pointing out that you’re probably not going to want to navigate through the code here except through its use-case as not everything here is used or perhaps working. Its WIP after all.</p>
+<p>Its probably worth pointing out that you’re probably not going to want to navigate through the code here except through its use-case as not everything here is used or perhaps working.</p>
 <h1 id="usage">Usage</h1>
 <ul>
 <li>Note that if you would like to compile arpeggio 20170422 (github.com/tfwio/arp), the only ‘animation’ used renders a little (useless) timing information, so a call to OnTimer in the <code>class Arpeggio</code> can be omitted if you don’t want to hack iplug as such.</li>
@@ -55,68 +54,11 @@ body {
 <li>See the hacks below for implementing <code>OnTimer</code></li>
 </ul>
 <h1 id="iplug-hacks">IPlug Hacks</h1>
-<p>I made a few simple little changes to some IPlug files to test out doing some custom animation stuffs on something other than the audio thread. As I’d only done this in windows, I’d like to eventually see how this might be handled on mac. Point being, if I wrote any plugins dependant on this library that are up on github, they’ll likely use the simple modification below somehow to enable animations one way or another via a call to <code>OnTimer</code> as mentioned…</p>
-<p><strong>IPlugBase.h</strong> (within the class)</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">virtual</span> <span class="dt">void</span> OnTimer(){}</code></pre>
-<p><strong>IGraphicsWin.h</strong></p>
-<p>The call to OnTimer was added within the following context.</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// static</span>
-LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  <span class="kw">if</span> (msg == WM_CREATE)
-  {
-    LPCREATESTRUCT lpcs = (LPCREATESTRUCT) lParam;
-    SetWindowLongPtr(hWnd, GWLP_USERDATA, (LPARAM) (lpcs-&gt;lpCreateParams));
-    <span class="dt">int</span> mSec = <span class="dt">int</span>(<span class="fl">1000.</span><span class="dv">0</span> / sFPS);
-    SetTimer(hWnd, IPLUG_TIMER_ID, mSec, NULL);
-    SetFocus(hWnd); <span class="co">// gets scroll wheel working straight away</span>
-    <span class="kw">return</span> <span class="dv">0</span>;
-  }
-
-  IGraphicsWin* pGraphics = (IGraphicsWin*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-
-  <span class="kw">if</span> (msg == WM_TIMER &amp;&amp; wParam == IPLUG_TIMER_ID)
-  {
-    pGraphics-&gt;mPlug-&gt;OnTimer();
-  }
-<span class="co">// ...</span></code></pre>
-<p><strong>IPlugStandalone.cpp</strong></p>
-<p>Added a <code>double mFramesCounted</code> member variable for a default (fallback) test display to render on the above timing method.</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> IPlugStandalone::LockMutexAndProcessDoubleReplacing(<span class="dt">double</span>** inputs, <span class="dt">double</span>** outputs, <span class="dt">int</span> nFrames)
-{
-  IMutexLock lock(<span class="kw">this</span>);
-  ProcessDoubleReplacing(inputs, outputs, nFrames);
-  mFramesCounted = fmod(mFramesCounted + nFrames, <span class="dv">60</span>*<span class="dv">44100</span>*<span class="dv">24</span>);
-}</code></pre>
-<p><strong>IPlugStructs.h</strong></p>
-<p>in IRECT, I still hadn’t gotten this out of there. There is probably an equivelant somewhere that makes this pointless, though if there is a dependency on this and I didn’t mention it may be rude.</p>
-<pre><code>static IRECT Create(int x, int y, int w, int h) { return IRECT(x,y,x+w, y+h); }</code></pre>
-<hr />
-<p>The only other thing worth mentioning is that I also added some calls to WINDOWS API into the mix for some controls (not in arpeggio) which move the mouse pointer. I’m not sure how to do this in MAC. I will clean out anything un-necessary and properly track changes to a patch and/or proper documentation in the fut.</p>
-<h2 id="lice-test-app">LICE test-app?</h2>
-<p>In <code>WDL/lice/test/test.rc</code>, change the following if you want to compile the lice test-app for Visual Studio Express 2013.</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// replace with windows.h</span>
-<span class="co">//#include &quot;afxres.h&quot;</span>
-<span class="ot">#include &lt;windows.h&gt;</span></code></pre>
-<p>Also to compile the lice test-proj <code>test.vcxproj</code> you need to add <code>PNG_WRITE_SUPPORTED</code> to the preprocessor definitions…</p>
-<p>There are (of course) a few ways you can do this either building from the command-line, manually adding this to the vcxproj file or from the IDE’s property-manager or editor.</p>
-<p>I might also have included something like the following somewhere</p>
-<p>File-name=<code>[wdl-ol]/WDL/lice/test/LiceInc.props</code></p>
-<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;utf-8&quot;<span class="kw">?&gt;</span>
-<span class="kw">&lt;Project</span><span class="ot"> ToolsVersion=</span><span class="st">&quot;4.0&quot;</span><span class="ot"> xmlns=</span><span class="st">&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;</span><span class="kw">&gt;</span>
-  <span class="kw">&lt;ImportGroup</span><span class="ot"> Label=</span><span class="st">&quot;PropertySheets&quot;</span> <span class="kw">/&gt;</span>
-  <span class="kw">&lt;PropertyGroup</span><span class="ot"> Label=</span><span class="st">&quot;UserMacros&quot;</span> <span class="kw">/&gt;</span>
-  <span class="kw">&lt;PropertyGroup</span> <span class="kw">/&gt;</span>
-  <span class="kw">&lt;ItemDefinitionGroup&gt;</span>
-    <span class="kw">&lt;ClCompile&gt;</span>
-      <span class="kw">&lt;AdditionalIncludeDirectories&gt;</span>..;%(AdditionalIncludeDirs)<span class="kw">&lt;/AdditionalIncludeDirectories&gt;</span>
-    <span class="kw">&lt;/ClCompile&gt;</span>
-    <span class="kw">&lt;Link&gt;</span>
-      <span class="kw">&lt;AdditionalDependencies&gt;</span>../build-win/$(Platform)/$(Configuration)/lice.lib;%(AdditionalDependencies)<span class="kw">&lt;/AdditionalDependencies&gt;</span>
-    <span class="kw">&lt;/Link&gt;</span>
-  <span class="kw">&lt;/ItemDefinitionGroup&gt;</span>
-  <span class="kw">&lt;ItemGroup</span> <span class="kw">/&gt;</span>
-<span class="kw">&lt;/Project&gt;</span></code></pre>
+<ul>
+<li>changes are best described by the patches in the <a href="patch">‘./patch’ directory</a><br /> against github.com/olilarkin/wdl-ol <a href="https://github.com/olilarkin/wdl-ol/commit/c16a383314612020b83d900c5ada1b8e82938816">commit</a>/<a href="https://github.com/olilarkin/wdl-ol/tree/c16a383314612020b83d900c5ada1b8e82938816">tree</a> c16a383</li>
+<li><a href="patch/wdl-ol_win.patch">wdl-ol_win.patch</a> adds the possibility for custom animations per the respective frame-rate passed into IplugBase’s timer cycles, adding a virtual call to <code>void OnTimer()</code> and there might be a few other less mindful things in iplugstructs.h-IRECT and such…</li>
+<li><a href="patch/lice-test_vs2013.patch">lice-test_vs2013.patch</a> helps building the lice/test app</li>
+</ul>
 </body>
 </html><style>
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {

@@ -1,0 +1,290 @@
+ .../IPlugExamples/Copy32bitToCommonFilesVST2.props | 13 ++++++++
+ .../IPlugExamples/Copy64bitCommonFilesVst2.props   | 12 +++++++
+ WDL/IPlug/IGraphicsWin.cpp          | 10 +++++-
+ WDL/IPlug/IPlug.vcxproj             | 14 ++++----
+ WDL/IPlug/IPlugBase.h               |  4 ++-
+ WDL/IPlug/IPlugStandalone.h         | 23 ++++++++++++--
+ WDL/IPlug/IPlugStructs.h            | 37 ++++++++++++++++++----
+ common.props                        |  1 +
+ 8 files changed, 95 insertions(+), 19 deletions(-)
+
+diff --git a/IPlugExamples/Copy32bitToCommonFilesVST2.props b/IPlugExamples/Copy32bitToCommonFilesVST2.props
+new file mode 100644
+index 0000000..7e455ac
+--- /dev/null
++++ b/IPlugExamples/Copy32bitToCommonFilesVST2.props
+@@ -0,0 +1,13 @@
++﻿<?xml version="1.0" encoding="utf-8"?>
++<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++  <ImportGroup Label="PropertySheets" />
++  <PropertyGroup Label="UserMacros" />
++  <PropertyGroup />
++  <ItemDefinitionGroup>
++    <PostBuildEvent>
++      <Command>copy "$(TargetPath)" "C:/Program Files (x86)/Common Files/VST2"</Command>
++    </PostBuildEvent>
++    <ClCompile />
++  </ItemDefinitionGroup>
++  <ItemGroup />
++</Project>
+\ No newline at end of file
+diff --git a/IPlugExamples/Copy64bitCommonFilesVst2.props b/IPlugExamples/Copy64bitCommonFilesVst2.props
+new file mode 100644
+index 0000000..9c56aa3
+--- /dev/null
++++ b/IPlugExamples/Copy64bitCommonFilesVst2.props
+@@ -0,0 +1,12 @@
++﻿<?xml version="1.0" encoding="utf-8"?>
++<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++  <ImportGroup Label="PropertySheets" />
++  <PropertyGroup Label="UserMacros" />
++  <PropertyGroup />
++  <ItemDefinitionGroup>
++    <PostBuildEvent>
++      <Command>copy "$(TargetPath)" "C:/Program Files/Common Files/VST2"</Command>
++    </PostBuildEvent>
++  </ItemDefinitionGroup>
++  <ItemGroup />
++</Project>
+\ No newline at end of file
+diff --git a/WDL/IPlug/IGraphicsWin.cpp b/WDL/IPlug/IGraphicsWin.cpp
+index 11f508f..52ccdd5 100644
+--- a/WDL/IPlug/IGraphicsWin.cpp
++++ b/WDL/IPlug/IGraphicsWin.cpp
+@@ -60,7 +60,14 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
+     return 0;
+   }
+ 
+-  IGraphicsWin* pGraphics = (IGraphicsWin*) GetWindowLongPtr(hWnd, GWLP_USERDATA);
++  IGraphicsWin* pGraphics = (IGraphicsWin*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
++
++  if (msg == WM_TIMER && wParam == IPLUG_TIMER_ID)
++  {
++    pGraphics->mPlug->OnTimer();
++
++  }
++
+   char txt[MAX_PARAM_LEN];
+   double v;
+ 
+@@ -83,6 +90,7 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
+ 
+     case WM_TIMER:
+     {
++
+       if (wParam == IPLUG_TIMER_ID)
+       {
+ 
+diff --git a/WDL/IPlug/IPlug.vcxproj b/WDL/IPlug/IPlug.vcxproj
+index 393df5e..77d62d9 100644
+--- a/WDL/IPlug/IPlug.vcxproj
++++ b/WDL/IPlug/IPlug.vcxproj
+@@ -1,5 +1,5 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <UsingTask TaskName="PaceFixLogs" AssemblyFile="$(PACE_FUSION_HOME)PaceFusionUi2013.dll" />
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug|Win32">
+@@ -36,41 +36,41 @@
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseDebugLibraries>true</UseDebugLibraries>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v120</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseDebugLibraries>true</UseDebugLibraries>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v120</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseDebugLibraries>false</UseDebugLibraries>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v120</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseDebugLibraries>false</UseDebugLibraries>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v120</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Tracer|Win32'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseDebugLibraries>false</UseDebugLibraries>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v120</PlatformToolset>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Tracer|x64'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseDebugLibraries>false</UseDebugLibraries>
+     <WholeProgramOptimization>true</WholeProgramOptimization>
+     <CharacterSet>MultiByte</CharacterSet>
+-    <PlatformToolset>v140</PlatformToolset>
++    <PlatformToolset>v120</PlatformToolset>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+   <ImportGroup Label="ExtensionSettings">
+diff --git a/WDL/IPlug/IPlugBase.h b/WDL/IPlug/IPlugBase.h
+index 459691f..3ee4453 100644
+--- a/WDL/IPlug/IPlugBase.h
++++ b/WDL/IPlug/IPlugBase.h
+@@ -65,6 +65,8 @@ public:
+   // Only active if USE_IDLE_CALLS is defined.
+   virtual void OnIdle() {}
+ 
++  virtual void OnTimer() {}
++
+   // Not usually needed ... Reset is called on activate regardless of whether this is implemented.
+   // Also different hosts have different interpretations of "activate".
+   // Implementations should set a mutex lock like in the no-op!
+@@ -323,10 +325,10 @@ protected:
+   NChanDelayLine* mDelay; // for delaying dry signal when mLatency > 0 and plugin is bypassed
+   WDL_PtrList<const char> mParamGroups;
+ 
++  WDL_PtrList<IPreset> mPresets;
+ private:
+   IGraphics* mGraphics;
+   WDL_PtrList<IParam> mParams;
+-  WDL_PtrList<IPreset> mPresets;
+   WDL_TypedBuf<double*> mInData, mOutData;
+   WDL_PtrList<InChannel> mInChannels;
+   WDL_PtrList<OutChannel> mOutChannels;
+diff --git a/WDL/IPlug/IPlugStandalone.h b/WDL/IPlug/IPlugStandalone.h
+index 325096c..dd6bb90 100644
+--- a/WDL/IPlug/IPlugStandalone.h
++++ b/WDL/IPlug/IPlugStandalone.h
+@@ -50,10 +50,24 @@ public:
+   void EndInformHostOfParamChange(int idx) {};
+   void InformHostOfProgramChange() {};
+ 
+-  int GetSamplePos() { return 0; }   // Samples since start of project.
+-  double GetTempo() { return DEFAULT_TEMPO; }
++  int GetSamplePos() { return int(mFramesCounted); }   // Samples since start of project.
++  double GetTempo() { return mTempo; }
+   void GetTimeSig(int* pNum, int* pDenom) { return; }
+-  void GetTime(ITimeInfo* pTimeInfo) { return; }
++  void GetTime(ITimeInfo* pTimeInfo) override {
++    //pTimeInfo = (ITimeInfo*)malloc(sizeof(ITimeInfo));
++    //IPlugBase::GetTime(pTimeInfo);
++    pTimeInfo->mCycleEnd = 0;
++    pTimeInfo->mCycleStart = 0;
++    pTimeInfo->mDenominator = 0;
++    pTimeInfo->mLastBar = 0;
++    pTimeInfo->mNumerator = 0;
++    pTimeInfo->mPPQPos = 0;
++    pTimeInfo->mSamplePos = mFramesCounted;
++    pTimeInfo->mTempo = mTempo;
++    pTimeInfo->mTransportIsRunning = true;
++    pTimeInfo->mTransportLoopEnabled = false;
++    return;
++  }
+ 
+   void ResizeGraphics(int w, int h);
+ 
+@@ -66,6 +80,9 @@ protected:
+ private:
+   RtMidiOut* mMidiOut;
+   unsigned short* mMidiOutChan;
++  //unsigned long long int nSamples;
++  double mFramesCounted,
++    mTempo;
+ };
+ 
+ IPlugStandalone* MakePlug(void* pMidiOutput, unsigned short* pMidiOutChan);
+diff --git a/WDL/IPlug/IPlugStructs.h b/WDL/IPlug/IPlugStructs.h
+index 3cdaf3d..f71c230 100644
+--- a/WDL/IPlug/IPlugStructs.h
++++ b/WDL/IPlug/IPlugStructs.h
+@@ -131,11 +131,15 @@ struct IText
+ #define MakeIRectHOffset(a, xoffs) IRECT(a##_X + xoffs, a##_Y, a##_X + a##_W + xoffs, a##_Y + a##_H)
+ #define MakeIRectVOffset(a, yoffs) IRECT(a##_X, a##_Y + yoffs, a##_X + a##_W, a##_Y + a##_H + yoffs)
+ #define MakeIRectHVOffset(a, xoffs, yoffs) IRECT(a##_X + xoffs, a##_Y + yoffs, a##_X + a##_W + xoffs, a##_Y + a##_H + yoffs)
++/*
++// added
++  inline static IRECT Create(int x, int y, int w, int h){ return IRECT(x, y, x + w, y + h); }
+ 
++*/
+ struct IRECT
+ {
+   int L, T, R, B;
+-
++  static IRECT Create(int x, int y, int w, int h) { return IRECT(x,y,x+w, y+h); }
+   IRECT() { L = T = R = B = 0; }
+   IRECT(int l, int t, int r, int b) : L(l), R(r), T(t), B(b) {}
+   IRECT(int x, int y, IBitmap* pBitmap) : L(x), T(y), R(x + pBitmap->W), B(y + pBitmap->H / pBitmap->N) {}
+@@ -160,10 +164,29 @@ struct IRECT
+     return !(*this == rhs);
+   }
+ 
++  inline void SetRect(int x, int y, int w, int h) { L = x; T = y; SetWidthHeight(w, h); }
++  inline void SetWidthHeight(int w, int h) { R = L + w; B = T + h; }
++  
++  inline void MoveBy(int xTo, int yTo, int xBy, int yBy) {
++    int w = W(), h = H();
++    this->L = xTo + xBy;
++    this->T += yTo + yBy;
++    this->R += xTo + xBy + w;
++    this->B += yTo + yBy + h;
++  }
++  inline void MoveBy(int x, int y) { L += x, T += y, R += x, B += y; }
++  inline void MoveTo(int x, int y) { SetRect(x, y, W(), H()); }
++  inline void MoveX(int x) { SetRect(x + L, T, W(), H()); }
++  inline void MoveY(int y) { SetRect(L, y + T, W(), H()); }
++
++  // width
+   inline int W() const { return R - L; }
++  // height
+   inline int H() const { return B - T; }
++  // mid-width
+   inline float MW() const { return 0.5f * (float) (L + R); }
+-  inline float MH() const { return 0.5f * (float) (T + B); }
++  // mid-height
++  inline float MH() const { return 0.5f * (float)(T + B); }
+ 
+   inline IRECT Union(IRECT* pRHS)
+   {
+@@ -220,17 +243,17 @@ struct IRECT
+   inline IRECT SubRectVertical(int numSlices, int sliceIdx)
+   {
+     float heightOfSubRect = (float(H()) / numSlices);
+-    int t = heightOfSubRect * sliceIdx;
+-
+-    return IRECT(L, T + t, R, T + t + heightOfSubRect);
++    int t = int(heightOfSubRect * sliceIdx);
++    // FIXME: TODO: WTF?
++    return IRECT(L, T + t, R, T + t + int(heightOfSubRect));
+   }
+ 
+   inline IRECT SubRectHorizontal(int numSlices, int sliceIdx)
+   {
+     float widthOfSubRect = (float(W()) / numSlices);
+-    int l = widthOfSubRect * sliceIdx;
++    int l = int(widthOfSubRect * sliceIdx);
+ 
+-    return IRECT(L + l, T, L + l + widthOfSubRect, B);
++    return IRECT(L + l, T, L + l + int(widthOfSubRect), B);
+   }
+   
+   inline IRECT GetPadded(int padding)
+diff --git a/common.props b/common.props
+index 8ca586d..1e0a8ed 100644
+--- a/common.props
++++ b/common.props
+@@ -25,6 +25,7 @@
+       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <DisableSpecificWarnings>4996;4250;4018;4267;</DisableSpecificWarnings>
++      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+     </ClCompile>
+     <Link>
+       <AdditionalLibraryDirectories>$(WDL_PATH)\IPlug\build-win\$(Platform)\$(Configuration)\;$(WDL_PATH)\lice\build-win\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
