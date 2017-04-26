@@ -1,7 +1,4 @@
-#include "IKnobText.h"
-#if _WIN32
-#pragma once
-#endif
+#include "ICControls.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // ICPanelControl
