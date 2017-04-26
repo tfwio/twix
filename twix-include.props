@@ -5,7 +5,9 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ADDITIONAL_INCLUDES);../../twix/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(ADDITIONAL_INCLUDES);../../twix/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <!-- Alternatively for _DEBUG or something you can -->
+      <!-- <PreprocessorDefinitions>use_iplug;show_inclusions;%(PreprocessorDefinitions)</PreprocessorDefinitions> -->
       <PreprocessorDefinitions>use_iplug;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
