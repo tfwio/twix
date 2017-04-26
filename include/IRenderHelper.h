@@ -1,14 +1,15 @@
 #ifndef __IRenderHelper_h__
 #define __IRenderHelper_h__
-#if _WIN32
-#pragma once
-#endif
+//#pragma once
 
 #include <IControl.h>
 ////////////////////////////////////////////////////////////////////////////
 // IRenderHelper
 ////////////////////////////////////////////////////////////////////////////
 
+// contains some methods that are inherited into IControl controls
+// for rendering a border around the control's boundary, perhaps while
+// under mouse-up, mouse-over or mouse-down conditions.
 class IRenderHelper
 {
 protected:
