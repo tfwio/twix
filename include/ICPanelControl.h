@@ -1,8 +1,8 @@
 #ifndef __ICPanelControl__
 #define __ICPanelControl__
-#ifdef _WIN32
-#pragma once
-#endif
+//#pragma once
+
+
 #include "ICControls.h"
 
 ////////////////////////////////////////////////////////////////////////////

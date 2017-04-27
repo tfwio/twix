@@ -1,10 +1,21 @@
 #ifndef __IKnobText_h__
 #define __IKnobText_h__
-#ifdef _WIN32
-#pragma once
-#endif
+//#pragma once
+
+#ifndef __ICControls_h__
+#  if defined(show_inclusions)
+#  pragma message("INCLUDED ICControls.h from IKnobText.h")
+#  endif
 #include "ICControls.h"
+#endif
+
+#ifndef __IRenderHelper_h__
+#  if defined(show_inclusions)
+#  pragma message("INCLUDED IRenderHelper.h from IKnobText.h")
+#  endif
 #include "IRenderHelper.h"
+#endif
+
 //static const FloatPoint fp_empty = FloatPoint(-1.0f, -1.0f);
 
 ////////////////////////////////////////////////////////////////////////////

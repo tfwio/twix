@@ -1,8 +1,6 @@
 #ifndef __IFloatNumberPanel_h__
 #define __IFloatNumberPanel_h__
-#ifdef _WIN32
-#pragma once
-#endif
+//#pragma once
 
 
 // DONT KNOW WHERE THE FOLLOWING COMMENT SHOULD GO IF NOT TO HLL

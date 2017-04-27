@@ -1,6 +1,7 @@
 #include "on.smf.h"
 
-#define SMF_CONSOLE
+#define SMF_CONSOLE 0
+
 #define IO_READ_MODE "r"
 //#define IO_READ_MODE "rb"
 
@@ -38,7 +39,7 @@ namespace on { namespace smf {
     fclose(fp);
 
     //heaDirty=true;
-#if defined(SMF_CONSOLE)
+#if (SMF_CONSOLE)
     printf("SMF:MIDI-header successfully loaded\n\n");
 #endif
     return 0; // j;
@@ -69,7 +70,7 @@ namespace on { namespace smf {
 
     //delete [] m_file.ckData;
     //heaDirty=true;
-#if defined(SMF_CONSOLE)
+#if (SMF_CONSOLE)
     printf("SMF:MIDI-Track->header successfully loaded\n\n");
 #endif
     return 0; // j;
@@ -84,7 +85,7 @@ namespace on { namespace smf {
     int32 newsize = m_file.ckData[trackid].ckHead.ckID.ckSize.GetValue();
     //m_file.ckData[trackid].
 
-#if defined(SMF_CONSOLE)
+#if (SMF_CONSOLE)
     printf("\tbuffer-pos> \"%d\"\n", bpos(fp));
     //uint cks = m_file.ckData[trackid].ckHead.ckID.ckSize.uuiv.GetValue();
     printf("\ttkID[%d]> \"%s\"\n", trackid, m_file.ckData[trackid].ckHead.ckID.ckHeadID.charID);

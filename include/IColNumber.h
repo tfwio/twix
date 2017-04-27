@@ -1,8 +1,7 @@
 #ifndef __col_number__
 #define __col_number__
-#ifdef _WIN32
-#pragma once
-#endif
+// #pragma once
+
 #include "ICControls.h"
 
 // IT APPEARS THIS CLASS IS NOT USED!

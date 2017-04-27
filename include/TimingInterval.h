@@ -1,11 +1,6 @@
 #ifndef __TIMING_INTERVAL__
 #define __TIMING_INTERVAL__
 
-// am not sure about mingw and how it might handle this
-#if WIN32
-#pragma once
-#endif
-
 class TimingInterval
 {
 public:
@@ -29,9 +24,9 @@ public:
     {
     case 0: Tempo = value; break;
     case 1: IsRunning = bool(value); break;
-    case 2: quar = byte(value); Update(); break;
-    case 3: divs = byte(value); Update(); break;
-    case 4: segs = byte(value); Update(); break;
+    case 2: quar = int8(value); Update(); break;
+    case 3: divs = int8(value); Update(); break;
+    case 4: segs = int8(value); Update(); break;
     }
   }
 

@@ -8,10 +8,6 @@ just some modifications to standard vector applying a sort algo.
   - remove
 */
 
-#if _WIN32
-#pragma once
-#endif
-
 #include <vector>
 #include <algorithm>
 

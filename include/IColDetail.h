@@ -1,9 +1,6 @@
 #ifndef __IColDetail_h__
 #define __IColDetail_h__
-#if _WIN32
-#pragma once
-#endif
-#include "ICControls.h"
+// #pragma once
 
 ////////////////////////////////////////////////////////////////////////////
 // __col_detail_t, ColumnDetail

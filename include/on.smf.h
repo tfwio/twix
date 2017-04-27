@@ -1,6 +1,6 @@
 #ifndef SND_MIDI
 #define SND_MIDI smf
-#pragma once
+//#pragma once
 
 #if !defined(__tfw_ioh__)
 // this really shouldn't be necessary

@@ -1,10 +1,7 @@
 // you must include <on.tfwio.h> and <on.defs.h>
 #ifndef __tfw_ioh__
 #define __tfw_ioh__
-
-#if _WIN32
 #pragma once
-#endif
 
 // we'll probably never use this but here is
 #ifdef __dll
@@ -16,13 +13,22 @@
 
 typedef unsigned char    uint8;
 typedef signed char      int8;
+typedef unsigned __int16 uint16;
+typedef signed __int16 int16;
 typedef unsigned __int32 uint32;
 typedef signed __int32   int32;
+typedef unsigned __int64 uint64;
+typedef signed __int64   int64;
 
 #ifdef use_console
-#pragma message("PRAGMA WARN: use_console has been defined.  Was this intended?")
+#  if defined(show_inclusions)
+#  pragma message("USING: use_console = 1")
+#  endif
 #define use_console 1
 #else
+#  if defined(show_inclusions)
+#  pragma message("USING: use_console = 0")
+#  endif
 #define use_console 0
 #endif
 
@@ -42,9 +48,8 @@ typedef signed __int32   int32;
 
 //#define use_iplug
 //#undef use_iplug
-#ifdef use_iplug
-#include <IPlugStructs.h>
-//fdef use_iplug
+#if defined(use_iplug) && !defined(_IPLUGSTRUCTS_)
+#include "IPlugStructs.h"
 #endif
 
 #include "on.defs.h"
@@ -311,6 +316,10 @@ typedef drawing::floatrect FloatRect, *FloatRect_t;
 typedef drawing::doublepoint DoublePoint;
 typedef drawing::doublerect DoubleRect;
 typedef drawing::intrect IntRect, *IntRect_t;
+
+
+
+
 //pedef std::vector<FloatPoint> PointCollection;
 class PointCollection : public std::vector<FloatPoint>
 {
@@ -545,6 +554,10 @@ public:
     return sal;
   }
 };
+
+
+
+
 //
 namespace on {
 namespace io {
@@ -755,12 +768,15 @@ typedef on::io::TPtr3D<float>   float3d;
 typedef on::io::TPtr3D<int>     int3d;
 //
 typedef on::io::__str_value_t<on::io::TypeN> StrValue;
+
+
+
 //
 namespace tfwio {
   typedef std::string string;
 
   // Oh.  I was going to write something that shouldn't be here.
-  struct f_range { ui64 start; ui64 length; };
+  struct f_range { uint64 start; uint64 length; };
   // 
   class fs_base {
   private:
@@ -894,15 +910,16 @@ namespace tfwio {
 #  define set_file     set_fileW
 #  define open_file_r  open_file_rW
 #  define open_file_rb open_file_rbW
+#  define get_position get_position64
     //#  define get_position get_positionW
 #endif
-#ifdef _WIN64
-    //  experimental
-    si64 fs_base::get_length64() { ui64 pos = get_position(); _fseeki64(file_pointer, 0, SEEK_END); ui64 len = _ftelli64(file_pointer); _fseeki64(file_pointer, pos, 0); /*returns the buffer where it started*/ return len; }
-    /*ui64 get_positionA() { if (file_nameA==0) return false; if (file_pointer==0) return false; fpos_t pp; fgetpos( file_pointer, &pp ); return (ui64)pp; }*/
-    ui64 fs_base::get_position64() { if (file_nameW == 0) return false; if (file_pointer == 0) return false; fpos_t pp; fgetpos(file_pointer, &pp); return (ui64)pp; }
-#else
-#endif
+//#ifdef _WIN64
+//    //  experimental
+//    int64 fs_base::get_length64() { uint64 pos = get_position(); _fseeki64(file_pointer, 0, SEEK_END); uint64 len = _ftelli64(file_pointer); _fseeki64(file_pointer, pos, 0); /*returns the buffer where it started*/ return len; }
+//    /*ui64 get_positionA() { if (file_nameA==0) return false; if (file_pointer==0) return false; fpos_t pp; fgetpos( file_pointer, &pp ); return (ui64)pp; }*/
+//    uint64 fs_base::get_position64() { if (file_nameW == 0) return false; if (file_pointer == 0) return false; fpos_t pp; fgetpos(file_pointer, &pp); return (ui64)pp; }
+//#else
+//#endif
   };
   //#pragma warning Note that compiler GPP flag - fpermissive needs to be set in order for (T)malloc(ranger->length) to be allowed
   // 
@@ -977,17 +994,15 @@ namespace snd {
   // waves have zstrings and other interesting tags that we might not really
   // expect all packed into a waveform file format such as r-iff.
 
-  using namespace tfwio;
-
   #pragma region endian utility
 
   #pragma pack(1)
 
   typedef union {
-    ui16	usvalue;
-    ui8		ubvalue[2];
-    ui16	GetValue() { return endo_ui16(ubvalue); }
-  } 
+    uint16	usvalue;
+    uint16	ubvalue[2];
+    uint16	GetValue() { return endo_ui16(ubvalue); }
+  }
   // (byte swap utility)
   // unsigned short and unsigned byte array type union.
   // 16-Bit endian conversion/automation union.
@@ -1001,8 +1016,8 @@ namespace snd {
   // to a char string[5] array appears wise.
   typedef union _uuint_t {
     
-    ui32	uivalue;
-    ui8		ubvalue[4];
+    uint32	uivalue;
+    uint8		ubvalue[4];
 
     char	*to_cstr5(int len=5) {
       char *returned = new char[len]; // +'\0'
@@ -1012,10 +1027,10 @@ namespace snd {
     }
 
     // performs Endian swap. see the #define macro: endo_ui32
-    ui32		GetValue() { return (int)endo_ui32(ubvalue); }
+    uint32		GetValue() { return endo_ui32(ubvalue); }
 
     //uint	GetValue(){ return (ubvalue[0]<<24|ubvalue[1]<<16|ubvalue[2]<<8|ubvalue[3]); }
-    operator uint (){ return GetValue(); }
+    operator uint32 (){ return GetValue(); }
     operator int (){  return (int)GetValue(); }
     operator char*(){ return (char*)ubvalue; }
   }
@@ -1034,7 +1049,7 @@ namespace snd {
 
   // this is a re-definition of the above _uuint_t, uuint_t and ChunkID
   typedef union {
-    ui8		charID[4];
+    uint8		charID[4];
     uuint	uuiv;
 
     // returns char-code ID with null terminator ('\0') for a total of 5 chars.
@@ -1054,7 +1069,7 @@ namespace snd {
   // FIXME: why is this here?
   typedef struct {
     snd_cktag	ckHeadID;
-    uuint ckSize;
+    uint32 ckSize;
     char *get_strval() { return ckHeadID.get_charID(); }
   }
   // unsigned long integer / 4-char ID
@@ -1158,7 +1173,7 @@ namespace snd {
   // Simple Chunk Header Tag
   typedef struct t_simple_header {
     uuint	ttype;
-    uint	length;
+    uint32	length;
     uuint	ttag;
     // Simple Chunk Header Tag
   } iff_simple_chunk;
@@ -1168,7 +1183,7 @@ namespace snd {
   // Neither has it been implemented.
   // we're not using malloc at all, actually.
   typedef struct _iff_zstr_t {
-    uint length;
+    uint32 length;
     char *value;
 
     // input must be terminated with a 'zero\0'
@@ -1196,10 +1211,10 @@ namespace snd {
   } zstr;
 
   typedef struct _iff_wzstr_t {
-    uint tag;
+    uint32 tag;
     zstr value;
     int length() { return value.length; }
-    void set_value(uint ntag, const char* input) {
+    void set_value(uint32 ntag, const char* input) {
       tag = ntag;
       value.set_value(input);
     }
@@ -1213,14 +1228,14 @@ namespace snd {
 
   // iff version tag
   typedef struct t_ck_iver {
-    ui16		Major;
-    ui16		Minor;
+    uint16		Major;
+    uint16		Minor;
   // iff info tag
   } iver;
 
   typedef struct t_ck_nfo {
     snd_ckltag	infoHead;
-    ui32		Length;
+    uint32		Length;
     iver		ifil;
     zstr		inam;
     zstr		isng;
@@ -1274,9 +1289,9 @@ namespace snd {
   // a default chunk type
   typedef struct t_iff_chunk {
     
-    ui8		ckID[4];	//	usually RIFF unless it's a sub-tag
-    uint	ckLength;	//	the length of the file-eight?
-    ui8		ckTag[4];	//	the tagname
+    uint8		ckID[4];	//	usually RIFF unless it's a sub-tag
+    uint32	ckLength;	//	the length of the file-eight?
+    uint8		ckTag[4];	//	the tagname
 
     char	*get_tag() {
       char *returned = new char[5];
@@ -1294,14 +1309,14 @@ namespace snd {
   //
   typedef struct t_fmt_chunk {
     char	chunkID[4];
-    ui32	chunkSize;
-    ui16	wFormatTag;
-    ui16	wChannels;
+    uint32	chunkSize;
+    uint16	wFormatTag;
+    uint16	wChannels;
     //	is this of the right size?
-    ui32	dwSamplesPerSec;
-    ui32	dwAvgBytesPerSec;
-    ui16	wBlockAlign;
-    ui16	wBitsPerSample;
+    uint32	dwSamplesPerSec;
+    uint32	dwAvgBytesPerSec;
+    uint16	wBlockAlign;
+    uint16	wBitsPerSample;
 
     char	*get_ckID() {
       char *returned = new char[5];
@@ -1315,7 +1330,7 @@ namespace snd {
   // 
   typedef struct t_iff_taginfo {
     char	ckID[4];
-    ui32	ckSize;
+    uint32	ckSize;
     char	*get_chunkID() {
       char *returned = new char[5];
       strncpy(returned, ckID, 4);
@@ -1327,10 +1342,10 @@ namespace snd {
   typedef struct t_ck_data {
     //use the freaking automated type, will you?
     char  chunkID[4];
-    ui32	chunkSize;
+    uint32	chunkSize;
     //should be a union unique to several audio data types & channels
     //but thats for the reader/writer to worry about
-    ui8		*waveformData;
+    uint8		*waveformData;
     //delete 'return_value'
     char	*get_chunkID() {
       char *returned = new char[5];
@@ -1373,16 +1388,16 @@ namespace snd {
     // this only works if the file is in an 'open' state
     // with (at least) read access.
     // Returns file size or (bool) false.
-    uint get_buffer_position() {
+    uint32 get_buffer_position() {
       if (file_path == 0) return false;
       fpos_t pp;
       fgetpos(fp, &pp);
-      return (uint)pp;
+      return (uint32)pp;
     }
     // 
-    uint get_file_size() {
+    uint32 get_file_size() {
       if (file_path == 0) return false;
-      uint uipos, uiend;
+      uint32 uipos, uiend;
       uipos = get_buffer_position();
       fseek(fp, 0, 2); // 2==SEEK_END
       uiend = get_buffer_position();

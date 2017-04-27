@@ -2,7 +2,9 @@
 #define __tfw_defs__
 
 #ifndef __tfw_ioh__
-#pragma message("WARNING: redundant include")
+#  if defined(show_inclusions)
+#  pragma message("WARNING: redundant include \"on.tfio.h\" from \"on.defs.h\"")
+#  endif
 #include "on.tfwio.h"
 #endif
 
@@ -133,7 +135,7 @@ typedef std::vector<std::vector<xnum>> listnum, *xlistnum;
 
   typedef signed short  SI16, si16;
   typedef signed __int32    SI32, si32;
-  typedef unsigned short  UI16, ui16;
+  typedef unsigned __int16  UI16, ui16;
   typedef unsigned __int32  UI32, ui32;
 
   // Unsigned 24 bit ints (as far as the scope of this library)
@@ -254,19 +256,19 @@ typedef UI24 ui_24, UI_24;
   // in order to see how such things are 'natively' handled.
 #endif
 
-typedef unsigned long long int UI64, ui64;
-typedef signed   long long int SI64, si64;
+typedef unsigned long long UI64, ui64;
+typedef signed   long long SI64, si64;
 typedef /*unsigned*/ long double F64, f64;
 
 typedef float   FLOAT16, float16, F16, f16;
-typedef double    FLOAT32, float32, F32, f32;
+typedef double  FLOAT32, float32, F32, f32;
 
 // just checking
 //typedef UI16  FLOAT; // is in WinDef.h as a float of course
 
 typedef unsigned char UBIT, ubit;
 typedef signed char   XBIT, xbit, CHID[4];
-typedef unsigned short  ushort;
+typedef unsigned short ushort;
 typedef signed short  sshort;
 
 typedef unsigned int 
@@ -291,7 +293,7 @@ typedef signed int    sint;
 #endif
 //  (I don't think this is used anywhere)
 #ifndef _i
-# define _i(v) ((UBIT)v)
+# define _i(v) ((uint8)v)
 #endif
 /*
 macro utility to lookup enumeration types defined in their respective helper content
@@ -301,16 +303,16 @@ if (v1&=v2!=0) (denoted by 'ckf macro' ... ) this retuns the associated char *st
 # define _xi(v1,v2,x1,x2,n) ckf(v1,v2) ? x1[n] : x2[n]
 
 // 32-Bit little-endian swapper (probably un-referenced and bugged... should probably push back 24bits and not 20)
-# define i_4(vvx)( (ui32)(vvx[0]<<20|vvx[1]<<16|vvx[2]<<8|vvx[3]) )
+# define i_4(vvx)( (uint32)(vvx[0]<<20|vvx[1]<<16|vvx[2]<<8|vvx[3]) )
 
 // 16-Bit little-endian swapper (probably un-referenced and bugged)
-# define i_2(vv)( (ui16)(vvx[0]<<8|vvx[1]) )
+# define i_2(vv)( uint16(vvx[0]<<8|vvx[1]) )
 
 //  16-Bit (working me-thinks) endian swap
-# define endo_ui16(v) (ui16)(v[0]<<8|v[1])
+# define endo_ui16(v) (uint16(v[0]<<8|v[1]))
 
 //  32-Bit (working me-thinks) endian swap
-# define endo_ui32(v) (ui32)(v[0]<<24|v[1]<<16|v[2]<<8|v[3])
+# define endo_ui32(v) (uint32(v[0]<<24|v[1]<<16|v[2]<<8|v[3]))
 
 // section:END tfw_defs.h
 
