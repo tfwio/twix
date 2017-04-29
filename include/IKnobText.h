@@ -2,6 +2,9 @@
 #define __IKnobText_h__
 //#pragma once
 
+#define WHEEL_DEPTH_DEFAULT 0.01
+#define WHEEL_DEPTH_CONTROL 0.001
+
 #ifndef __ICControls_h__
 #  if defined(show_inclusions)
 #  pragma message("INCLUDED ICControls.h from IKnobText.h")
@@ -29,7 +32,7 @@ class IKnobText : public IKnobMultiControl, public IRenderHelper
 protected:
 public:
   bool    showEdgeMarks = 1;
-  IKnobText::IKnobText(
+  IKnobText(
     IPlugBase* pPlug
     , int x, int y
     , int paramIdx, IBitmap* pBitmap, IText *iText
@@ -43,23 +46,74 @@ public:
     , myText(*iText)
     , mTextFormat(strFmt), mLineHeight(iText->mSize)
     , tRect(x, y + h, x + w, y + textH)
+    , mWheelManual(1)
+    , mWheelChangeSmall(0.333333)
+    , mWheelChangeDefault(1.)
   {
+
     mTargetRECT.B += textH;
-    
+    mDisablePrompt = false;
     //mTargetRECT = IRECT(mRECT);
   }
-  IKnobText::~IKnobText(){}
+  ~IKnobText(){}
 
-  bool IKnobText::Draw(IGraphics* pGraphics);
-  bool IKnobText::IsDirty();
+  bool Draw(IGraphics* pGraphics);
+  bool IsDirty();
 
-  void IKnobText::ClearCharNames()
+  void OnMouseDown(int x, int y, IMouseMod* pMod) override
+  {
+#ifdef PROTOOLS
+    if (pMod->A && mDefaultValue >= 0.0)
+    {
+      mValue = mDefaultValue;
+      SetDirty();
+    }
+#endif
+    if ((pMod->S && pMod->R) || (pMod->C && pMod->R)) {
+      PromptUserInput();
+    }
+    // if (pMod->R) {
+    //   PromptUserInput();
+    // }
+  }
+  void OnMouseWheel(int x, int y, IMouseMod* pMod, int d) override
+  {
+//#ifdef PROTOOLS
+//    if (pMod->C)
+//    {
+//      mValue += 0.001 * d;
+//    }
+//#else
+//#endif
+    if (mWheelManual){
+      switch (GetParam()->Type())
+      {
+      case IParam::EParamType::kTypeInt:
+        if (pMod->C || pMod->S) mValue += WHEEL_DEPTH_CONTROL * d;
+        else mValue = ToNormalizedParam(GetParam()->Int() + (mWheelChangeDefault*d), GetParam()->GetMin(), GetParam()->GetMax(), 1.0);
+        break;
+      default:
+        if (pMod->C || pMod->S) mValue += WHEEL_DEPTH_CONTROL * d;
+        else mValue += WHEEL_DEPTH_DEFAULT * d;
+        break;
+      }
+    }
+    else
+    {
+      if (pMod->C || pMod->S) mValue += WHEEL_DEPTH_CONTROL * d;
+      else mValue += WHEEL_DEPTH_DEFAULT * d;
+    }
+
+    SetDirty();
+  }
+
+  void ClearCharNames()
   {
     charNames = nullptr;
     charNamesCount = NULL;
     hasCharNames = false;
   }
-  void IKnobText::SetCharNames(int count, char** charnames)
+  void SetCharNames(int count, char** charnames)
   {
     charNames = charnames;
     charNamesCount = count;
@@ -67,7 +121,8 @@ public:
   }
 
 protected:
-
+  bool    mWheelManual;
+  double  mWheelChangeSmall, mWheelChangeDefault;
   char**  charNames; // we have the clear charNames properly weather it is or not set ;(
   int     charNamesCount;
   bool    hasCharNames = 0;

@@ -80,7 +80,7 @@ public:
       SetTextFromPlug(mStr.Get());
       return mStr;
     }
-    
+
     return WDL_String("?");
   }
 
@@ -118,7 +118,7 @@ protected:
     iMouseOver2      // over[1]
     ;
 public:
-  virtual void ICControl::OnMouseOver(int x, int y, IMouseMod *pMod) override {
+  virtual void OnMouseOver(int x, int y, IMouseMod *pMod) override {
     IControl::OnMouseOver ( x, y, pMod );
     iMouseMove2    . from ( iMouseMove ); // back up prior MouseMove
     iMouseMove     . set  ( x, y );       // Set a new MouseMove
@@ -127,30 +127,30 @@ public:
     iMouseOverDiff . from ( iMouseOver2 - iMouseOver );
     iMouseOverD    . from ( iMouseOverD.compare() );
   }
-  virtual void ICControl::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod *pMod) override {
+  virtual void OnMouseDrag(int x, int y, int dX, int dY, IMouseMod *pMod) override {
     iMouseMove2    . from(iMouseMove);
     iMouseMove     . set(x, y);
     iMouseDownDiff . from(iMouseMove2 - iMouseMove);
     iMouseDownD    . from(iMouseDownD.compare());
   }
-  virtual void ICControl::OnMouseUp(int x, int y, IMouseMod *pMod) override {
+  virtual void OnMouseUp(int x, int y, IMouseMod *pMod) override {
     mIsDown = false;
     iMouseMove2    . from(iMouseMove);
     iMouseMove     . set(x, y);
     iMouseDownDiff . from(iMouseMove2 - iMouseMove);
   }
-  virtual void ICControl::OnMouseDown(int x, int y, IMouseMod *pMod) override {
+  virtual void OnMouseDown(int x, int y, IMouseMod *pMod) override {
     mIsDown = true;
     iMouseDown     . set(x, y);
     iMouseMove2    . from(iMouseMove);
     iMouseMove     . set(x, y);
     //MouseD.from(MouseMove2.X - MouseMove.X, MouseMove2.Y - MouseMove.Y);
   }
-  virtual void ICControl::OnMouseDblClick(int x, int y, IMouseMod *pMod) override {
+  virtual void OnMouseDblClick(int x, int y, IMouseMod *pMod) override {
 
   }
 
-  ICControl::ICControl(IPlugBase* pPlug, IRECT pR, int paramIdx = -1, IChannelBlend blendMethod = IChannelBlend::kBlendNone)
+  ICControl(IPlugBase* pPlug, IRECT pR, int paramIdx = -1, IChannelBlend blendMethod = IChannelBlend::kBlendNone)
     : IControl(pPlug, pR, paramIdx, blendMethod)
     , ColourFg(255, 0, 0, 0), ColourBg(0, 0, 0, 0)
     , iMouseDown(1, 1)
@@ -161,9 +161,9 @@ public:
     , mAdjust(3)
   {
   }
-  ICControl::~ICControl(){
+  ~ICControl(){
   }
-  inline void ICControl::update()
+  inline void update()
   {
     if (this->mParamIdx > -1) {
       IParam *par = this->GetParam();
@@ -197,10 +197,10 @@ public:
     EDirection direction = kVertical, bool reverse = false);
   ~IRadioButtonMatrixControl() {}
 
-  // 
+  //
   void OnMouseDown(int x, int y, IMouseMod* pMod);
-  
-  // 
+
+  //
   bool Draw(IGraphics* pGraphics);
 
 protected:

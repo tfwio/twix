@@ -23,7 +23,7 @@ public:
     , cropSize(size)
   {
   }
-  ~ICPanelControl(){ IPanelControl::~IPanelControl(); }
+  ~ICPanelControl(){ /*~IPanelControl();*/ }
 
   virtual bool Draw(IGraphics *pGraphics) override;
   bool     cropShow;

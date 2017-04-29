@@ -18,8 +18,8 @@ class IBitmapButton : public ICControl
 {
 
 public:
-  
-  IBitmapButton::IBitmapButton(IPlugBase* pPlug, int x, int y, IBitmap* pBitmap,
+
+  IBitmapButton(IPlugBase* pPlug, int x, int y, IBitmap* pBitmap,
     IChannelBlend::EBlendMethod blendMethod = IChannelBlend::kBlendNone)
     : ICControl(pPlug, IRECT(x, y, pBitmap), -1, blendMethod)
     , mTargetParamId(-1)
@@ -30,11 +30,11 @@ public:
   {
     mDblAsSingleClick = true;
   }
-  
-  virtual IBitmapButton::~IBitmapButton() override {}
-  
+
+  virtual ~IBitmapButton() override {}
+
   //////////////////////////////////////////////////////////////////////////
-  // IBitmapButton *IBitmapButton::Handler
+  // IBitmapButton *Handler
   //////////////////////////////////////////////////////////////////////////
   enum EHandlerType
   {
@@ -43,14 +43,14 @@ public:
     handle_up
   };
 
-  IBitmapButton *IBitmapButton::setParamInfo(int pId, int pValue)
+  IBitmapButton *setParamInfo(int pId, int pValue)
   {
     mTargetParamId = pId;
     mTargetParamValue = pValue;
     return this;
   }
 
-  virtual IBitmapButton *IBitmapButton::Handler(std::function<void()> callback, EHandlerType hType)
+  virtual IBitmapButton *Handler(std::function<void()> callback, EHandlerType hType)
   {
     switch (hType)
     {
@@ -60,7 +60,7 @@ public:
     return this;
   }
 
-  virtual bool IBitmapButton::Draw(IGraphics* pGraphics) override {
+  virtual bool Draw(IGraphics* pGraphics) override {
     int i = 1;
     if (mBitmap.N > 1)
     {
@@ -69,23 +69,23 @@ public:
     }
     return pGraphics->DrawBitmap(&mBitmap, &mRECT, i, &mBlend);
   }
-  
-  //bool IBitmapButton::IsDirty() { return true; }
-  virtual void IBitmapButton::OnMouseUp(int x, int y, IMouseMod *pMod) override {
+
+  //bool IsDirty() { return true; }
+  virtual void OnMouseUp(int x, int y, IMouseMod *pMod) override {
     ICControl::OnMouseUp(x, y, pMod);
     mValue = IsTargetParamSelected() ? 1 : 0;
     if (this->mHasUpHandler) this->mUpEventHandler();
   }
-  virtual void IBitmapButton::OnMouseOver(int x, int y, IMouseMod *pMod) override {
+  virtual void OnMouseOver(int x, int y, IMouseMod *pMod) override {
     ICControl::OnMouseOver(x, y, pMod);
     mValue = mIsDown ? 0.5 : 1;
   }
-  virtual void IBitmapButton::OnMouseOut() override {
+  virtual void OnMouseOut() override {
     IControl::OnMouseOut();
     mValue = IsTargetParamSelected() ? 1 : 0;
   }
-  virtual void IBitmapButton::OnMouseDblClick(int x, int y, IMouseMod *pMod) override {}
-  virtual void IBitmapButton::OnMouseDown(int x, int y, IMouseMod *pMod) override
+  virtual void OnMouseDblClick(int x, int y, IMouseMod *pMod) override {}
+  virtual void OnMouseDown(int x, int y, IMouseMod *pMod) override
   {
     ICControl::OnMouseDown(x, y, pMod);
     mValue = IsTargetParamSelected() ? 1. : 0.5;

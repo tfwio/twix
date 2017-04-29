@@ -41,7 +41,6 @@ typedef signed __int64   int64;
 #include <iostream>
 #include <cstdlib>
 
-#include <filesystem>
 
 #include <set>
 #include <vector>
@@ -57,94 +56,8 @@ typedef signed __int64   int64;
 // #include "snd.h" // selected (WAVEFORMAT) headers were included
 #define for_points(points,int_to_iterate,int_start) for (int int_to_iterate = int_start; int_to_iterate < points.size(); i++)
 
-namespace on {
-namespace fs {
-    // rather effective documentation
-    // http://www.boost.org/doc/libs/1_43_0/libs/filesystem/doc/index.htm
 
-    // iterate through the directory specified by input directory path fpath.
-    static void get_pathinfo(std::string fpath, std::vector<std::string> &FileNames) {
-      namespace fx = std::tr2::sys;
-      fx::path directory(fpath);
-      fx::directory_iterator iter(directory), ifiles(directory), end;
-      std::cout << std::endl << "dirs" << std::endl;
-      for (; iter != end; ++iter)
-      {
-        if (!fx::is_directory(iter->path())) continue;
-        FileNames.push_back(iter->path().filename().c_str());
-        std::cout << "  - " << FileNames.at(FileNames.size() - 1).c_str() << std::endl;
-      }
-      std::cout << std::endl << "file" << std::endl;
-      for (; ifiles != end; ++ifiles)
-        //  if (iter->path().extension() == ".txt")
-      {
-        if (!fx::is_regular_file(ifiles->path())) continue;
-        FileNames.push_back(ifiles->path().filename().c_str());
-        std::cout << "  - " << FileNames.at(FileNames.size() - 1).c_str() << std::endl;
-      }
-    }
-    static std::string get_pathinfo(std::string fpath, std::string ext, std::vector<std::string> &DirNames, std::vector<std::string> &FileNames) {
-      namespace fx = std::tr2::sys;
-      fx::path directory(fpath);
-      fx::directory_iterator end;
-
-      std::cout << std::endl << "dir:" << std::endl;
-      for (fx::directory_iterator iter(directory); iter != end; ++iter)
-      {
-        if (!fx::is_directory(iter->path())) continue;
-        std::string s = iter->path().filename();
-        DirNames.push_back(s);
-        std::cout << "  - " << s.c_str() << std::endl;
-      }
-      std::cout << std::endl << "file" << std::endl;
-      for (fx::directory_iterator ifiles(directory); ifiles != end; ++ifiles)
-        if (ifiles->path().extension() == ext)
-        {
-          if (!fx::is_regular_file(ifiles->path())) continue;
-          std::string s = ifiles->path().filename();
-          FileNames.push_back(s);
-          std::cout << "  - " << s.c_str() << std::endl;
-        }
-    }
-
-    static bool get_filename(std::string file) {
-      namespace fx = std::tr2::sys;
-      fx::path filepath = file;
-      return filepath.filename().c_str();
-    }
-    static bool is_directory(std::string file) {
-      namespace fx = std::tr2::sys;
-      fx::path filepath = file;
-      return fx::is_directory(filepath);
-    }
-    static bool is_file(std::string file) {
-      namespace fx = std::tr2::sys;
-      fx::path filepath = file;
-      return fx::is_regular_file(filepath);
-    }
-    static void examine_path(std::string file) {
-      namespace fx = std::tr2::sys;
-      fx::path filepath = file;
-      std::cout << (fx::exists(filepath) ? " - path exists" : "path don't exist") << std::endl;
-      std::cout << "  - basename=" << filepath.basename() << std::endl;
-      // has_branch_path is obsoleted; use has_parent_path  
-      std::cout << "  - has_branch_path=" << filepath.has_branch_path() << std::endl;
-      std::cout << "  - has_parent_path=" << filepath.has_parent_path() << std::endl;
-      std::cout << "    -   branch_path=" << filepath.branch_path() << std::endl;
-      std::cout << "    -   branch_path=" << filepath.parent_path() << std::endl;
-      std::cout << "  - directory_string=" << filepath.directory_string() << std::endl;
-      std::cout << "  - filename=" << filepath.filename() << std::endl;
-      std::cout << "  - has_leaf=" << filepath.has_leaf() << std::endl;
-      std::cout << "    -   leaf=" << filepath.leaf() << std::endl;
-      std::cout << "  - is_directory=" << fx::is_directory(filepath) << std::endl;
-      std::cout << "  - is_regular_file=" << fx::is_regular_file(filepath) << std::endl;
-
-      std::vector<std::string> files = std::vector<std::string>();
-      get_pathinfo(file, files);
-      std::cout << std::endl << std::endl;
-    }
-  };
-}; // on::fs
+#include "on.std_fs.h"
 #endif
 //EOF//////////////////////////////////////////////////////////////////////////////////
 
@@ -152,21 +65,22 @@ namespace fs {
 namespace drawing {
   struct intpoint {
     int X, Y;
-    void intpoint::set(int x, int y) { X = x; Y = y; } // same as copy
-    void intpoint::set(intpoint p) { X = p.X; Y = p.Y; } // same as copy
+    void set(int x, int y) { X = x; Y = y; } // same as copy
+    void set(intpoint p) { X = p.X; Y = p.Y; } // same as copy
     // obsolete. use set.  copy is for intpoint
-    //void intpoint::from(int x, int y) { X = x; Y = y; } // same as set
-    void intpoint::from(intpoint p) { X = p.X; Y = p.Y; }
-    //intpoint intpoint::copy(int x, int y) { return intpoint(x, y); } // same as set
-    //intpoint intpoint::copy(intpoint p) { return intpoint(p.X, p.Y); }
+    //void from(int x, int y) { X = x; Y = y; } // same as set
+    void from(intpoint p) { X = p.X; Y = p.Y; }
+    //intpoint copy(int x, int y) { return intpoint(x, y); } // same as set
+    //intpoint copy(intpoint p) { return intpoint(p.X, p.Y); }
 
     void roll_y(int x, int y, IRECT &sizeRef)
     {
       if (y >= sizeRef.B) Y -= sizeRef.H();
       else if (y < sizeRef.T) Y += sizeRef.H();
     }
-    intpoint::intpoint() : intpoint(0,0) { }
-    intpoint::intpoint(int x, int y) { X = x; Y = y; }
+
+    intpoint() : intpoint(0,0) { }
+    intpoint(int x, int y) { X = x; Y = y; }
 
     int compare(int input) {
       if (input < 0) return -1;
@@ -198,8 +112,8 @@ namespace drawing {
   struct floatpoint {
 
     float X, Y;
-    floatpoint::floatpoint() : floatpoint(0.0f, 0.0f) {}
-    floatpoint::floatpoint(float x, float y) { X = x; Y = y; }
+    floatpoint() : floatpoint(0.0f, 0.0f) {}
+    floatpoint(float x, float y) { X = x; Y = y; }
 
     const floatpoint mult(const floatpoint& p) { return floatpoint(X * p.X, Y * p.Y); }
     const floatpoint divi(const floatpoint& p) { return floatpoint(X / p.X, Y / p.Y); }
@@ -213,8 +127,8 @@ namespace drawing {
   struct doublepoint {
 
     double X, Y;
-    doublepoint::doublepoint() : doublepoint(0.0f, 0.0f) {}
-    doublepoint::doublepoint(double x, double y) { X = x; Y = y; }
+    doublepoint() : doublepoint(0.0f, 0.0f) {}
+    doublepoint(double x, double y) { X = x; Y = y; }
 
     const doublepoint mult(const doublepoint& p) { return doublepoint(X * p.X, Y * p.Y); }
     const doublepoint divi(const doublepoint& p) { return doublepoint(X / p.X, Y / p.Y); }
@@ -230,83 +144,83 @@ namespace drawing {
     FloatPoint Location;
     FloatPoint Size;
 
-    float floatrect::L() { return Location.X; }
-    float floatrect::X() { return Location.X; }
+    float L() { return Location.X; }
+    float X() { return Location.X; }
 
-    float floatrect::Y() { return Location.Y; }
-    float floatrect::T() { return Location.Y; }
+    float Y() { return Location.Y; }
+    float T() { return Location.Y; }
 
-    float floatrect::B() { return Location.Y + Size.Y; }
-    void floatrect::SetB(float bottom) { Size.Y = bottom - Y(); }
+    float B() { return Location.Y + Size.Y; }
+    void SetB(float bottom) { Size.Y = bottom - Y(); }
 
-    float floatrect::R() { return Location.X + Size.X; }
-    void floatrect::SetR(float r) { Size.X = r - X(); }
+    float R() { return Location.X + Size.X; }
+    void SetR(float r) { Size.X = r - X(); }
 
 
-    floatrect::floatrect(FloatPoint location, FloatPoint size) : Location(location), Size(size) { }
-    floatrect::floatrect(float x, float y, float w, float h) : Location(x, y), Size(w, h) { }
+    floatrect(FloatPoint location, FloatPoint size) : Location(location), Size(size) { }
+    floatrect(float x, float y, float w, float h) : Location(x, y), Size(w, h) { }
   };
   struct doublerect {
     using DoublePoint = drawing::doublepoint;
     DoublePoint Location;
     DoublePoint Size;
 
-    double doublerect::L() { return Location.X; }
-    double doublerect::X() { return Location.X; }
+    double L() { return Location.X; }
+    double X() { return Location.X; }
 
-    double doublerect::Y() { return Location.Y; }
-    double doublerect::T() { return Location.Y; }
+    double Y() { return Location.Y; }
+    double T() { return Location.Y; }
 
-    double doublerect::B() { return Location.Y + Size.Y; }
-    double doublerect::SetB(double bottom) { Size.Y = bottom - Y(); }
+    double B() { return Location.Y + Size.Y; }
+    double SetB(double bottom) { Size.Y = bottom - Y(); }
 
-    double doublerect::R() { return Location.X + Size.X; }
-    void doublerect::SetR(double r) { Size.X = r - X(); }
+    double R() { return Location.X + Size.X; }
+    void SetR(double r) { Size.X = r - X(); }
 
 
-    doublerect::doublerect(DoublePoint location, DoublePoint size) : Location(location), Size(size) { }
-    doublerect::doublerect(double x, double y, double w, double h) : Location(x, y), Size(w, h) { }
+    doublerect(DoublePoint location, DoublePoint size) : Location(location), Size(size) { }
+    doublerect(double x, double y, double w, double h) : Location(x, y), Size(w, h) { }
   };
   struct intrect {
     intpoint Location;
     intpoint Size;
 
-    void intrect::Move(intpoint p) { Location = Location + p; }
-    void intrect::MoveTo(intpoint p) { Location.X = p.X, Location.Y = p.Y; }
-    void intrect::MoveTo(intrect p) { Size.X = p.X(), Size.Y = p.Y(); }
-    void intrect::MoveTo(int x, int y) { Size.X = x, Size.Y = y; }
-    void intrect::MoveX(intpoint p) { Location.X += p.X; }
-    void intrect::MoveY(intpoint p) { Location.Y += p.Y; }
-    int intrect::L() { return Location.X; }
-    int intrect::X() { return Location.X; }
-    int intrect::R() { return Location.X + Size.X; }
-    void  intrect::SetR(int r) { Size.X = r - X(); }
+    void Move(intpoint p) { Location = Location + p; }
+    void MoveTo(intpoint p) { Location.X = p.X, Location.Y = p.Y; }
+    void MoveTo(intrect p) { Size.X = p.X(), Size.Y = p.Y(); }
+    void MoveTo(int x, int y) { Size.X = x, Size.Y = y; }
+    void MoveX(intpoint p) { Location.X += p.X; }
+    void MoveY(intpoint p) { Location.Y += p.Y; }
+    int L() { return Location.X; }
+    int X() { return Location.X; }
+    int R() { return Location.X + Size.X; }
+    void  SetR(int r) { Size.X = r - X(); }
 
-    void intrect::ScaleTo(intpoint p) { Size.X = p.X, Size.Y = p.Y; }
-    void intrect::ScaleTo(intrect p) { Size.X = p.X(), Size.Y = p.Y(); }
-    void intrect::ScaleTo(int w, int h) { Size.X = w, Size.Y = h; }
-    void intrect::ScaleX(intpoint p) { Size.X += p.X; }
-    void intrect::ScaleY(intpoint p) { Size.Y += p.Y; }
-    int intrect::Y() { return Location.Y; }
-    int intrect::T() { return Location.Y; }
-    int intrect::B() { return Location.Y + Size.Y; }
-    void  intrect::SetB(int bottom) { Size.Y = bottom - Y(); }
-    void intrect::Set(int x, int y, int w, int h) { this->MoveTo(x, y); this->ScaleTo(w, h); }
+    void ScaleTo(intpoint p) { Size.X = p.X, Size.Y = p.Y; }
+    void ScaleTo(intrect p) { Size.X = p.X(), Size.Y = p.Y(); }
+    void ScaleTo(int w, int h) { Size.X = w, Size.Y = h; }
+    void ScaleX(intpoint p) { Size.X += p.X; }
+    void ScaleY(intpoint p) { Size.Y += p.Y; }
+    int Y() { return Location.Y; }
+    int T() { return Location.Y; }
+    int B() { return Location.Y + Size.Y; }
+    void SetB(int bottom) { Size.Y = bottom - Y(); }
+    void Set(int x, int y, int w, int h) { this->MoveTo(x, y); this->ScaleTo(w, h); }
 
     #ifdef use_iplug
-    void intrect::Set(IRECT &rect) { intrect::MoveTo(rect.L, rect.T); intrect::ScaleTo(rect.W(), rect.H()); }
+    void Set(IRECT &rect) { intrect::MoveTo(rect.L, rect.T); intrect::ScaleTo(rect.W(), rect.H()); }
 
     // not within critical loop: IRECT auto-conversion
     operator const IRECT(){ return IRECT(Location.X, Location.Y, T(), R()); }
 
     // .CTOR from IRECT
-    intrect::intrect(IRECT &rect) : Location(rect.L, rect.T), Size(rect.W(), rect.H()) { }
+    intrect(IRECT &rect) : Location(rect.L, rect.T), Size(rect.W(), rect.H()) { }
     // so for IRECT to be convertable to intpoint without help,
     // the operator would have to be written in IPlugStructs.h
     #endif
 
-    intrect::intrect(intpoint location, intpoint size) : Location(location), Size(size) { }
-    intrect::intrect(int x, int y, int w, int h) : Location(x, y), Size(w, h) { }
+    intrect(intpoint location, intpoint size) : Location(location), Size(size) { }
+    intrect(int x, int y, int w, int h) : Location(x, y), Size(w, h) { }
   };
 };
 //
@@ -321,6 +235,7 @@ typedef drawing::intrect IntRect, *IntRect_t;
 
 
 //pedef std::vector<FloatPoint> PointCollection;
+
 class PointCollection : public std::vector<FloatPoint>
 {
   #define str_vector_iterator(int_iter,str_vec) for (std::vector<std::string>::const_iterator int_iter = str_vec.begin(); int_iter < str_vec.end(); int_iter++)
@@ -375,7 +290,7 @@ public:
       if (i < lastpoint) str->append(" ");
     }
   }
-  
+
   PointCollection(int size) : std::vector<FloatPoint>(size)
   {
   }
@@ -447,7 +362,7 @@ public:
     // cout << endl; // blank space;
     return points;
   }
-  
+
   static void SplitCDF(PointCollection & pc, const std::string & sentence = "0,90 1,120 2,230 3,150") {
 
     std::vector<std::string> data;
@@ -481,7 +396,7 @@ public:
     }
   }
   static void cdf2intpt(std::vector<std::string> & data, const std::string & sentence = "0,90 1,120 2,230 3,150") {
-    
+
     // attempt tokenization of the sentence.
     StrUtil::tokenize(sentence, data, " ");
 
@@ -530,7 +445,7 @@ public:
     double intpart;
     modf(nom, &intpart);
     std::string ck = std::to_string(int(intpart));
-    str[ck.length() + 6] = '\0'; // 1 (for the decimal) + 6 (number of digits past the decimal) - 1 (zero inclusive index) 
+    str[ck.length() + 6] = '\0'; // 1 (for the decimal) + 6 (number of digits past the decimal) - 1 (zero inclusive index)
 
     std::string sal = str;
     long numr = long(nom);
@@ -539,7 +454,7 @@ public:
     if (comma) sal.insert(3, ",");
     return sal;
   }
-  
+
   static std::string float2str(double nom, char pad='0', bool comma=true, int d=5)
   {
     char str[__x_max_str_x__];
@@ -608,6 +523,8 @@ namespace io {
       catch (char * message) { std::cout << "unknown error (iteration)" << std::endl; }
       return data;
     }
+    /*
+    // there really is no jm?
     static void free_data2(TDecimal **data) {
       int i, j;
       //for (k = 0; k < km; k++)
@@ -615,6 +532,7 @@ namespace io {
       for (i = 0; i < im; i++) free(data[i]);
       free(data);
     }
+    */
     // malloc() is called on `TDecimal data[x][y][z]` (such as `TDecimal ***data`)
     // at each x, y and z `TDecimal` level.
     static TDecimal*** init_data3(int x, int y, int z) {
@@ -664,7 +582,7 @@ namespace io {
   //   return (int***)data;
   // }
 
-  // 
+  //
   typedef enum {
     kt_null = 0, kt_unknown
     // unknown > 0 < kt_bool
@@ -683,9 +601,9 @@ namespace io {
   TypeN;
 
 
-  // 
+  //
   // Default = TypeN
-  // 
+  //
   // Enumeration or integer type which can store layers and perhaps
   // using external helper functions decode different flag values
   // from such as directory-flags or file-system-attributes or some-such.
@@ -694,7 +612,7 @@ namespace io {
   // between various formats and our string value here.
   // I suppose we're missing parsing features for such things as times
   // and dates.
-  // 
+  //
   // Note: double precision conversions may be effected by
   // compiler language/locality at compile time.
   struct __str_value_t {
@@ -742,18 +660,18 @@ namespace io {
     TypeN type;
     std::string key, val;
 
-    void ini_section::set_value(double  value, TypeN type=TypeN::kt_double) { this->type = type; val = std::to_string(value); }
-    void ini_section::set_value(float   value, TypeN type=TypeN::kt_float)  { this->type = type; val = std::to_string(value); }
-    void ini_section::set_value(int     value, TypeN type=TypeN::kt_int32)  { this->type = type; val = std::to_string(value); }
-    void ini_section::set_value(long    value, TypeN type=TypeN::kt_long)   { this->type = type; val = std::to_string(value); }
-    void ini_section::set_value(short   value, TypeN type=TypeN::kt_int16)  { this->type = type; val = std::to_string(value); }
+    void set_value(double  value, TypeN type=TypeN::kt_double) { this->type = type; val = std::to_string(value); }
+    void set_value(float   value, TypeN type=TypeN::kt_float)  { this->type = type; val = std::to_string(value); }
+    void set_value(int     value, TypeN type=TypeN::kt_int32)  { this->type = type; val = std::to_string(value); }
+    void set_value(long    value, TypeN type=TypeN::kt_long)   { this->type = type; val = std::to_string(value); }
+    void set_value(short   value, TypeN type=TypeN::kt_int16)  { this->type = type; val = std::to_string(value); }
 
-    double ini_section::Double() { return atof(val.c_str()); }
-    float  ini_section::Float()  { return strtof(val.c_str(), NULL); }
-    char  *ini_section::Text()   { return (char *)val.c_str(); }
-    int    ini_section::Int32()  { return atoi(val.c_str()); }
+    double Double() { return atof(val.c_str()); }
+    float  Float()  { return strtof(val.c_str(), NULL); }
+    char  *Text()   { return (char *)val.c_str(); }
+    int    Int32()  { return atoi(val.c_str()); }
 
-    ini_section::ini_section(std::string k, TypeN t, std::string v)
+    ini_section(std::string k, TypeN t, std::string v)
       : key(k), type(t), val(v)
     {
     }
@@ -777,7 +695,7 @@ namespace tfwio {
 
   // Oh.  I was going to write something that shouldn't be here.
   struct f_range { uint64 start; uint64 length; };
-  // 
+  //
   class fs_base {
   private:
     wchar_t *file_nameW;
@@ -798,7 +716,7 @@ namespace tfwio {
     * \param fname (char*) file-name string.
     * \param autoload If true, automatically calls "open_file_rbW()".
     */
-    virtual void fs_base::set_fileA(const char *fname, bool autoload = false) {
+    virtual void set_fileA(const char *fname, bool autoload = false) {
       file_nameA = (char*)fname;
       if (autoload) open_file_rbA();
     }
@@ -809,7 +727,7 @@ namespace tfwio {
     * \param fname (wchar_t*) file-name string.
     * \param autoload If true, automatically calls "open_file_rbW()".
     */
-    virtual void fs_base::set_fileW(const wchar_t *fname, bool autoload = false) {
+    virtual void set_fileW(const wchar_t *fname, bool autoload = false) {
       file_nameW = (wchar_t*)fname;
       if (autoload) open_file_rbW();
     }
@@ -826,12 +744,12 @@ namespace tfwio {
     // lock_file
     /** \brief Not implemented.
     */
-    virtual void fs_base::lock_file() {};
+    virtual void lock_file() {};
     // close_file
     /** \brief close_file();
     * It should be obvios what this method does.
     */
-    void fs_base::close_file() {
+    void close_file() {
       if (file_pointer != nullptr) {
         fclose(file_pointer);
       }
@@ -839,13 +757,13 @@ namespace tfwio {
     }
     // open_file_rA open_file_rW open_file_rbA open_file_rbW
     /** \brief Loads a standard ansi file with read privelages */
-    void fs_base::open_file_rA() {
+    void open_file_rA() {
       file_pointer = fopen(file_nameA, "r" /*"a"*/);
       is_unicode = false;
     }
 
     /** \brief loads wide character file with read privelages */
-    void fs_base::open_file_rW() {
+    void open_file_rW() {
       file_pointer = _wfopen(file_nameW, L"r" /*"a"*/);
       is_unicode = true;
     }
@@ -854,13 +772,13 @@ namespace tfwio {
     // this may have been working in prior c compiler environments (i've used)
 
     /** \brief Unknown b flag implemented in file-mode (loads a file with read access). */
-    void fs_base::open_file_rbA() {
+    void open_file_rbA() {
       file_pointer = fopen(file_nameA, "rb" /*"a"*/);
       is_unicode = false;
     }
 
     /** \brief binary b flag implemented in file-mode (loads a wide-char file with read access). */
-    long fs_base::open_file_rbW() {
+    long open_file_rbW() {
       file_pointer = _wfopen(file_nameW, L"rb" /*"a"*/);
       is_unicode = true;
       printf("fs_base::open_file_rbW()\n");
@@ -868,7 +786,7 @@ namespace tfwio {
     }
 
     /** \brief binary b flag implemented in file-mode (loads a wide-char file with read access). */
-    long fs_base::open_file_textW() {
+    long open_file_textW() {
       _wfopen_s(&file_pointer, file_nameW, L"r,ccs=UTF-8" /*"a"*/);
       is_unicode = true;
       return get_length();
@@ -876,7 +794,7 @@ namespace tfwio {
     // get_position get_length
 
     /** \brief Unknown b flag implemented in file-mode (loads a wide-char file with read access). */
-    long fs_base::get_position() {
+    long get_position() {
       if ((is_unicode ? file_nameW == 0 : file_nameA == 0)) return false;
       if (file_pointer == 0) return false;
       fpos_t pp;
@@ -884,7 +802,7 @@ namespace tfwio {
       return (long)pp;
     }
     /** \brief Self explanitory method */
-    long fs_base::get_length() {
+    long get_length() {
       long pos = get_position();
       fseek(file_pointer, 0, SEEK_END);
       long len = ftell(file_pointer);
@@ -892,7 +810,7 @@ namespace tfwio {
       return len;
     }
 
-    void fs_base::seek(long position)
+    void seek(long position)
     {
       if (file_pointer == 0) std::wcout << L"Shit! the file wasn't opened." << std::endl;
       fseek(file_pointer, position, SEEK_END);
@@ -922,7 +840,7 @@ namespace tfwio {
 //#endif
   };
   //#pragma warning Note that compiler GPP flag - fpermissive needs to be set in order for (T)malloc(ranger->length) to be allowed
-  // 
+  //
   // Not Implemented? Good ;)
   template<typename T>
   // Note that compiler GPP flag -fpermissive needs to be set in order for
@@ -949,12 +867,12 @@ namespace tfwio {
   // Not Implemented? Good ;)
   class ini_io : public fs_base {
   public:
-    ini_io::ini_io(wchar_t *file_in, bool autoLoad = false) {
+    ini_io(wchar_t *file_in, bool autoLoad = false) {
       fs_base::set_fileW(file_in, autoLoad);
     }
     // RETURN BUFFER SIZE.
     // DO NOT FORGET TO DE-ALLOCATE THE BUFFER!
-    long ini_io::get_bufferw(wchar_t *buffer, long maxSize) {
+    long get_bufferw(wchar_t *buffer, long maxSize) {
       long filesize = get_length();
       buffer = (wchar_t*)malloc(filesize); // the returned data
       fread(buffer, sizeof(wchar_t), filesize < maxSize ? filesize : maxSize, file_pointer);
@@ -962,20 +880,20 @@ namespace tfwio {
     }
     // RETURN BUFFER SIZE.
     // DO NOT FORGET TO DE-ALLOCATE THE BUFFER!
-    long ini_io::get_buffer(char *buffer, long maxSize) {
+    long get_buffer(char *buffer, long maxSize) {
       long filesize = get_length();
       buffer = (char*)malloc(filesize); // the returned data
       fread(buffer, sizeof(char), filesize < maxSize ? maxSize : filesize, file_pointer);
       return filesize;
     }
   };
-  
+
   // silly silly.
   template <typename T> class vec {
   public:
     std::vector<T> sec;
     std::vector<T> ite;
-    vec::vec() : sec() {
+    vec() : sec() {
     }
   };
 }; // end ns tfwio
@@ -987,7 +905,7 @@ namespace on {
 namespace snd {
 #include <stdlib.h>
 #include <string.h>
-  
+
   // TODO: data-stream samantics
   // I want to see a data-stream semantic
   // we would like to read and write wave files in the future.
@@ -1015,7 +933,7 @@ namespace snd {
   // Otherwise, copying 4 chars from the char pointer
   // to a char string[5] array appears wise.
   typedef union _uuint_t {
-    
+
     uint32	uivalue;
     uint8		ubvalue[4];
 
@@ -1078,7 +996,7 @@ namespace snd {
 
   #pragma pack()
 
-  #pragma endregion � union typedefs 
+  #pragma endregion - union typedefs
   };
 }; //h_out
 //
@@ -1090,7 +1008,7 @@ namespace snd {
 namespace on {
 namespace snd {
     // really, not any of this belongs here.
-    // 
+    //
     // the only thing that I can think of that does belong here would be a
     // base class for reading riff headers or the riff_io class (which is
     // defined elsewhere) or writing a waveform file (one might think)
@@ -1123,13 +1041,13 @@ namespace snd {
       snd_w_Technician = 0x49544348  //	"ITCH"
       // there are 23
     };
-    // 
+    //
     static const std::string itt_hd[23] = {
       "IARL", "IART", "ICMS", "ICMT", "ICOP", "ICRD", "ICRP", "IDIM", "IDPI", "IENG",
       "IGNR", "IKEY", "ILGT", "IMED", "INAM", "IPLT", "IPRD", "ISBJ", "ISFT", "ISHP",
       "ISRC", "ISRF", "ITCH"
     };
-    // 
+    //
 #pragma endregion wave info tag name enumeration
   };
 };
@@ -1242,9 +1160,9 @@ namespace snd {
 
     // could we just throw a map in here?
     // what is INFOsub as we used in csharp?
-    // 
+    //
     // std::map<long, INFOsub> nfosub;
-    // 
+    //
     //	public Dictionary<long,INFOsub> nfosub;
     //	public INFO(int ckSize, BinaryReader bir, FileStream fis)
     //	{
@@ -1274,7 +1192,7 @@ namespace snd {
     // - Length = bir.ReadInt32
     // - long pos = fis.Position
     // - nfosub = new Dictionary<>
-    // - while (fis.Position < pos+ckSize-4) { 
+    // - while (fis.Position < pos+ckSize-4) {
     //     long hand = fis.Position;
     //     INFOsub inx = new INFOsub(bir,fis,this);
     //     fis.Seek(hand+inx.Length+8,SeekOrigin.Begin);
@@ -1282,13 +1200,13 @@ namespace snd {
     // }
     // - interestingly, it appears that nothing is added to our local dictionary from
     //   the above code snipping, so I'm not quite sure what is the proper course of action.
-    // 
+    //
   } iff_ck_nfo;
-  
+
   // iff chunk
   // a default chunk type
   typedef struct t_iff_chunk {
-    
+
     uint8		ckID[4];	//	usually RIFF unless it's a sub-tag
     uint32	ckLength;	//	the length of the file-eight?
     uint8		ckTag[4];	//	the tagname
@@ -1327,7 +1245,7 @@ namespace snd {
     /*	Note: there may be additional fields here, depending upon wFormatTag. */
   } FormatChunk, *lpFMT;
 
-  // 
+  //
   typedef struct t_iff_taginfo {
     char	ckID[4];
     uint32	ckSize;
@@ -1354,7 +1272,7 @@ namespace snd {
       return returned;
     }
   } DataChunk, *lpDATA;
-  
+
   // 12 (on line 1030?)
   #define IFF_HEADERSIZE (size_t)0x0C
 
@@ -1368,16 +1286,16 @@ namespace snd {
   // R-IFF/Wave Format reader
   class iff_riff_wave {
   protected:
-    // 
+    //
     FILE       *fp;
-    // 
+    //
     lpCHUNK     fmt_chunk;
   public:
     // We have not yet defined a wide-char file path.
     char       *file_path;
-    // 
+    //
     long int    file_length;
-    // 
+    //
     iff_riff_wave() {}
     // TODO: MAKE SURE THIS WORKS!!!
     ~iff_riff_wave() {
@@ -1394,7 +1312,7 @@ namespace snd {
       fgetpos(fp, &pp);
       return (uint32)pp;
     }
-    // 
+    //
     uint32 get_file_size() {
       if (file_path == 0) return false;
       uint32 uipos, uiend;
@@ -1404,7 +1322,7 @@ namespace snd {
       fseek(fp, uipos, 0); // ordinal position==0==SEEK_SET
       return uiend;
     }
-    // 
+    //
     int get_file_sizeu() {
       if (file_path == 0) return false;
       int uipos, uiend;
@@ -1426,7 +1344,7 @@ namespace snd {
       fseek(fp, spoint, 0);
       return data;
     }
-    // 
+    //
     int get_int_position(long position, bool return_bpos = false) {
       int opos;
       if (return_bpos) opos = get_buffer_position();
@@ -1436,7 +1354,7 @@ namespace snd {
       if (return_bpos) fseek(fp, opos, 0);
       return data;
     }
-    // 
+    //
     int get_next_chunk() {
       int cpos = get_buffer_position();
       if (cpos >= file_length) return false;
@@ -1445,21 +1363,21 @@ namespace snd {
       fseek(fp, cpos, 0);
       return cpos + 8 + value;
     }
-    // 
+    //
     lpTAGINFO get_next_generic() {
       int cpos = get_buffer_position();
-      if (cpos >= file_length) return false;
+      if (cpos >= file_length) return 0;
       // or do we do size of pointer?
       // I'll go with the size of the structure.
       int gsize = sizeof(t_iff_taginfo);
-      // 
+      //
       lpTAGINFO gCK; // I'm a pointer.
       gCK = (lpTAGINFO) malloc(gsize);
-      // 
+      //
       fread(gCK, gsize, 1, fp);
-      // 
+      //
       if (use_console) printf("'%s'> '%d'\n", gCK->get_chunkID(), gCK->ckSize);
-      // 
+      //
       fseek(fp, cpos, 0);
       if (use_console) printf("==========================\n");
       return gCK;
@@ -1486,7 +1404,7 @@ namespace snd {
       if (use_console) printf(__T("IFF-header successfully loaded\n\n"));
       return j;
     }
-    // 
+    //
     int set_file(char *new_path) {
       if (new_path == 0) return false;
       file_path = new_path;

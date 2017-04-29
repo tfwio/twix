@@ -26,7 +26,7 @@ namespace tfwio {
 #endif // __cplusplus
 
   // section:BEGIN tfw_icu.h
-  
+
   // what are you doing here?
 #if defined(use_uni)
 #  if defined(UNICODE) || defined(_UNICODE) && !defined(_MBCS)
@@ -52,7 +52,8 @@ namespace tfwio {
 # define dcall inline
 #endif
 
-typedef __wchar_t xtr, *xstr;  // and this
+// no __wchar_t in mingw `typedef __wchar_t xtr, *xstr;  // and this`
+typedef wchar_t xtr, *xstr;  // and this
 
 // COME ON!  Really? ---but I guess this makes sense to switch between them
 #if xnum_isfloat
@@ -173,9 +174,9 @@ typedef std::vector<std::vector<xnum>> listnum, *xlistnum;
 # define _set24_br(v,b) ( b[2]=(v&0xFF0000)>>16, b[1]=(v & 0xFF00)>>8, b[0]=(v & 0xFF) )
   /**  */
 # define _set24(v) int((v&0xFF0000)>>16|(v&0xFF00)>>8|(v&0xFF))
-  
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+
   /**
 * 24 bit unsigned (unary) integer
 */
@@ -271,7 +272,7 @@ typedef signed char   XBIT, xbit, CHID[4];
 typedef unsigned short ushort;
 typedef signed short  sshort;
 
-typedef unsigned int 
+typedef unsigned int
   ulong, // ?why is this unsigned int?
   uint;  // please don't use this
 

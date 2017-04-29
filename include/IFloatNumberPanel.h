@@ -86,7 +86,7 @@ protected:
   }
 
 public:
-  IFloatNumberPanel::IFloatNumberPanel(
+  IFloatNumberPanel(
     IPlugBase* plug // IPlugBase
     , int c_width
     , IRECT&   rect // underlying PanelControl
@@ -112,7 +112,7 @@ public:
     , cd(rect.L, mCharWidth)
   {
     this->mTooltip = WDL_String(tooltip);
-    
+
   }
 
   #pragma region GetWRect(void) TopLeft(void) SetCursorPos(IntPoint) FIXME: MAC MAC MAC
@@ -136,13 +136,13 @@ public:
   }
 
   #pragma endregion
-  
-  virtual void IFloatNumberPanel::OnMouseOver(int x, int y, IMouseMod* pMod) override;
-  virtual void IFloatNumberPanel::OnMouseDown(int x, int y, IMouseMod* pMod) override;
-  virtual void IFloatNumberPanel::OnMouseWheel(int x, int y, IMouseMod* pMod, int d) override;
-  virtual void IFloatNumberPanel::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod* pMod) override;
-  virtual void IFloatNumberPanel::OnMouseUp(int x, int y, IMouseMod* pMod) override;
-  virtual bool IFloatNumberPanel::Draw(IGraphics* pGraphics) override;
+
+  virtual void OnMouseOver(int x, int y, IMouseMod* pMod) override;
+  virtual void OnMouseDown(int x, int y, IMouseMod* pMod) override;
+  virtual void OnMouseWheel(int x, int y, IMouseMod* pMod, int d) override;
+  virtual void OnMouseDrag(int x, int y, int dX, int dY, IMouseMod* pMod) override;
+  virtual void OnMouseUp(int x, int y, IMouseMod* pMod) override;
+  virtual bool Draw(IGraphics* pGraphics) override;
 
   #if WIN32
   // this really should never be used
@@ -160,6 +160,6 @@ public:
 
   void DrawStringPart(IGraphics *pGraphics, IRECT &r, int col, int hot);
 
-  // bool IFloatNumberPanel::IsDirty() { return true; }
+  // bool IsDirty() { return true; }
 };
 #endif
