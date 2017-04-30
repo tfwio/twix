@@ -1,8 +1,6 @@
 #ifndef __ICControl__
 #define __ICControl__
-#ifdef _WIN32
-#pragma once
-#endif
+//#pragma once
 #include "ICControls.h"
 
 

@@ -47,16 +47,16 @@ class SortedNotes : public NoteVector
 {
   static bool sort_notes(MidiNode a, MidiNode b) { return (a.GetNote() < b.GetNote()); }
 public:
-  SortedNotes::SortedNotes() : NoteVector(0){}
-  SortedNotes::SortedNotes(int count) : NoteVector(count){}
-  SortedNotes::~SortedNotes() {}
+  SortedNotes() : NoteVector(0){}
+  SortedNotes(int count) : NoteVector(count){}
+  ~SortedNotes() {}
 
   /**
   get the index of a particular value, or -1 on fail.
 
   @param value    the value to be found; (GetNoteMod())
   @param start    start index [default=0] */
-  inline int SortedNotes::get_index(int value, int start = 0) {
+  inline int get_index(int value, int start = 0) {
     if (start > size()) return -1;
     for (int i = start; i < size(); i++)
       if (at(i).GetNote() == value) return i;
@@ -67,7 +67,7 @@ public:
   and returns `true` if the `value` is present in the vector.
   @param value         the droid we are looking for
   @param found_index   [out] index or -1 is placed here. */
-  inline bool SortedNotes::has_value(int value, int found_index = -1)
+  inline bool has_value(int value, int found_index = -1)
   {
     int index = get_index(value);
     found_index = int(index);
@@ -77,7 +77,7 @@ public:
   /**
   adds into the stack in sequential order
   @param value    the value to be added. */
-  bool SortedNotes::add(MidiNode value)
+  bool add(MidiNode value)
   {
     int known_index = -1;
     if (has_value(value.GetNote(), known_index)) return false;
@@ -86,12 +86,12 @@ public:
     std::sort(begin(), end(), &sort_notes);
     return true;
   }
-  
+
 
   /**
   remove a particular value from the vector
   @param value     the number to be removed */
-  bool SortedNotes::remove(int value)
+  bool remove(int value)
   {
     if (!has_value(value)) return false;
     //const SortedNotes myVec = GetConst();
