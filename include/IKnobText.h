@@ -110,7 +110,7 @@ public:
   void ClearCharNames()
   {
     charNames = nullptr;
-    charNamesCount = NULL;
+    charNamesCount = 0;
     hasCharNames = false;
   }
   void SetCharNames(int count, char** charnames)
