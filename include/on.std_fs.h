@@ -8,8 +8,10 @@
 //       -  https://github.com/Alexpux/MINGW-packages/issues/2292
 // using boost see: http://www.boost.org/doc/libs/1_64_0/libs/filesystem/doc/deprecated.html
 //                                                ^^^^^^
-#if defined(_MSC_VER) && (_MSC_VER >= 1800)
-#  include "on.std_vc_fs.h"
+#if defined(_MSC_VER) && (_MSC_VER == 1800)
+#  include "on.std_vc_fs.h"                   ^^^^^^
+#elif defined(_MSC_VER) && (_MSC_VER == 1900)
+#  include "on.std_vc14_fs.h"
 #else
 #  include "on.std_gc_fs.h"
 #endif
