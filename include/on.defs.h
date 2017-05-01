@@ -190,11 +190,11 @@ public:
       ui8 lo, mid, hi;
     } ui24_range;
   };
-  ui32 set_valuer(ui32 value) { _set24_br(value, ui24b); return get_value(); }
-  ui32 set_value(ui32 value) { _set24_b(value, ui24b); return get_value(); }
-  ui32 get_value() { return _ui24(ui24b); }
-  ui32 get_rvalue() { return _ui24r(ui24b); }
-  ui8 operator[](int value)
+  uint32 set_valuer(uint32 value) { _set24_br(value, ui24b); return get_value(); }
+  uint32 set_value(uint32 value) { _set24_b(value, ui24b); return get_value(); }
+  uint32 get_value() { return _ui24(ui24b); }
+  uint32 get_rvalue() { return _ui24r(ui24b); }
+  uint8 operator[](int value)
   {
     if ((value<3) && (value >= 0)) return this->ui24b[value];
     else return false;
@@ -234,7 +234,7 @@ public:
   return (T)false;
   }*/
   //UI24 operator =(float value) { UI24 val; val.set_value((ui32)value); return val; }
-  ui8 operator[](int value)
+  uint8 operator[](int value)
   {
     if ((value<3) && (value >= 0)) return this->ui24b[value];
     else return false;
