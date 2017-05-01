@@ -435,34 +435,37 @@ public:
   //  return sal;
   //}
 
-  static std::string float2str_alt(double nom, char pad = '0', bool comma = true, int d = 5)
+  static std::string float2str_alt(double nom, char pad = '0', bool comma = true, const int d = 5)
   {
     char str[__x_max_str_x__];
-    char *flo = "%.6f";
+    const char *flo = "%.6f";
     //flo[2] = (char)(30 + d + 1);
     sprintf_s(str, __x_max_str_x__, flo, nom);
     //"9999.999999"
     double intpart;
     modf(nom, &intpart);
     std::string ck = std::to_string(int(intpart));
-    str[ck.length() + 6] = '\0'; // 1 (for the decimal) + 6 (number of digits past the decimal) - 1 (zero inclusive index)
+    const int ncount = d > 0 ? d + 1 : d; // 1 (=the decimal point) + 5 or d (=number of digits past the decimal) - 1 (zero inclusive index but where does -1 occur?)
+    str[ck.length() + ncount] = '\0';
 
     std::string sal = str;
-    long numr = long(nom);
+    //long numr = long(nom);
     std::string cs = str;
-    sal.insert(sal.begin(), 12 - sal.length(), pad);
+    sal.insert(sal.begin(), 12 - sal.length(), pad);// 12 chars = '000000.00000'
     if (comma) sal.insert(3, ",");
     return sal;
   }
-
-  static std::string float2str(double nom, char pad='0', bool comma=true, int d=5)
+  // we want to use the above since it formats without rounding
+  // using "%.6f\0" compared to "%.5f\0", then it cleans up the value returned.
+  // (but not this method)
+  static std::string float2str(double nom, char pad='0', bool comma=true, const int d=5)
   {
     char str[__x_max_str_x__];
     char *flo = "%.5f\0";
     flo[2] = (char)(30 + d);
     sprintf_s(str, __x_max_str_x__, flo, nom);
     std::string sal = str;
-    long numr = int(nom);
+    //long numr = int(nom);
     std::string cs = str;
     sal.insert(sal.begin(), 12 - sal.length(), pad);
     if (comma) sal.insert(3, ",");
@@ -1358,7 +1361,7 @@ namespace snd {
     int get_next_chunk() {
       int cpos = get_buffer_position();
       if (cpos >= file_length) return false;
-      char *pchar = peek_ahead();
+      //char *pchar = peek_ahead();
       int value = get_int_position(cpos + 4);
       fseek(fp, cpos, 0);
       return cpos + 8 + value;
