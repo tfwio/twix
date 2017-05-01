@@ -65,7 +65,7 @@ void IFloatNumberPanel::OnMouseWheel(int x, int y, IMouseMod* pMod, int d) {
 void IFloatNumberPanel::DrawStringPart(IGraphics *pGraphics, IRECT &r, int col, int hot) {
   char str[2];
   str[1] = 0;
-  std::string xo = StrUtil::float2str(mValue); // what we draw first
+  std::string xo = StrUtil::float2str_alt(mValue); // what we draw first
   for (int i = 0; i < xo.length(); i++)
   {
     str[0] = xo.at(i);
