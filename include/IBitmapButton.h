@@ -1,8 +1,8 @@
 #ifndef __IBitmapButton_h__
 #define __IBitmapButton_h__
-#ifdef _WIN32
-#pragma once
-#endif
+//#ifdef _WIN32
+//#pragma once
+//#endif
 
 #include "ICControls.h"
 
@@ -10,7 +10,9 @@
 // IBitmapButton
 ////////////////////////////////////////////////////////////////////////////
 
+#ifdef USE_CSTD_FUNCTIONAL
 #include <functional>
+#endif
 
 // We want our control to display different states:
 // - mouse-hover, mouse-down, normal (and perhaps disabled)
@@ -25,8 +27,10 @@ public:
     , mTargetParamId(-1)
     , mTargetParamValue(-1)
     , mBitmap(*pBitmap)
+#ifdef USE_CSTD_FUNCTIONAL
     , mHasDownHandler(false)
     , mHasUpHandler(false)
+#endif
   {
     mDblAsSingleClick = true;
   }
@@ -50,7 +54,8 @@ public:
     return this;
   }
 
-  virtual IBitmapButton *Handler(std::function<void()> callback, EHandlerType hType)
+#ifdef USE_CSTD_FUNCTIONAL
+virtual IBitmapButton *Handler(std::function<void()> callback, EHandlerType hType)
   {
     switch (hType)
     {
@@ -59,6 +64,7 @@ public:
     }
     return this;
   }
+#endif
 
   virtual bool Draw(IGraphics* pGraphics) override {
     int i = 1;
@@ -74,7 +80,9 @@ public:
   virtual void OnMouseUp(int x, int y, IMouseMod *pMod) override {
     ICControl::OnMouseUp(x, y, pMod);
     mValue = IsTargetParamSelected() ? 1 : 0;
+#ifdef USE_CSTD_FUNCTIONAL
     if (this->mHasUpHandler) this->mUpEventHandler();
+#endif
   }
   virtual void OnMouseOver(int x, int y, IMouseMod *pMod) override {
     ICControl::OnMouseOver(x, y, pMod);
@@ -89,7 +97,9 @@ public:
   {
     ICControl::OnMouseDown(x, y, pMod);
     mValue = IsTargetParamSelected() ? 1. : 0.5;
+#ifdef USE_CSTD_FUNCTIONAL
     if (this->mHasDownHandler) this->mDownEventHandler();
+#endif
     if (IsTargeted() && !IsTargetParamSelected()) SetTargetParam();
   }
 
@@ -117,8 +127,10 @@ private:
 
   // protected:
   IBitmap mBitmap;
+#ifdef USE_CSTD_FUNCTIONAL
   std::function<void()> mDownEventHandler, mUpEventHandler;
   bool mHasDownHandler, mHasUpHandler;
+#endif
 };
 #endif
 
