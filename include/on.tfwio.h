@@ -125,11 +125,9 @@ namespace drawing {
     const floatpoint operator-(const floatpoint& p) { return subt(p); }
   };
   struct doublepoint {
-
     double X, Y;
     doublepoint() : doublepoint(0.0f, 0.0f) {}
     doublepoint(double x, double y) { X = x; Y = y; }
-
     const doublepoint mult(const doublepoint& p) { return doublepoint(X * p.X, Y * p.Y); }
     const doublepoint divi(const doublepoint& p) { return doublepoint(X / p.X, Y / p.Y); }
     const doublepoint  add(const doublepoint& p) { return doublepoint(X + p.X, Y + p.Y); }
@@ -231,16 +229,14 @@ typedef drawing::doublepoint DoublePoint;
 typedef drawing::doublerect DoubleRect;
 typedef drawing::intrect IntRect, *IntRect_t;
 
-
-
-
 //pedef std::vector<FloatPoint> PointCollection;
 
 class PointCollection : public std::vector<FloatPoint>
 {
   #define str_vector_iterator(int_iter,str_vec) for (std::vector<std::string>::const_iterator int_iter = str_vec.begin(); int_iter < str_vec.end(); int_iter++)
   template < class ContainerT >
-  inline void tokenize(
+  //__attribute__((always_inline)) or __forceinline or_no inline
+  void tokenize(
     const std::string& str,
     ContainerT& tokens,
     const std::string& delimiters = " ",
@@ -306,7 +302,7 @@ public:
   //  mbstowcs(output, input, 256);
   //}
 
-  inline static char *wchar2char(wchar_t *input, int charMax) {
+  /*inline*/ static char *wchar2char(wchar_t *input, int charMax) {
     char *filen_char;
     filen_char = (char*)malloc(256);
     wcstombs(filen_char, input, 256);
@@ -473,9 +469,6 @@ public:
   }
 };
 
-
-
-
 //
 namespace on {
 namespace io {
@@ -501,7 +494,7 @@ namespace io {
   // this is experimental designed to create and manage an array
   // such as short[n][o][p];
   template<typename TDecimal> class TPtr3D {
-  public:
+  public://inline static
     static TDecimal** init_data2(int x, int y) {
       int i, j, k;
       TDecimal **data;
