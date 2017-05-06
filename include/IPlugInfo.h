@@ -4,7 +4,7 @@
 
 #if !defined(_IPLUG_INCLUDE_HDR_)
 // was for intellisense only, but now is used by default
-#include "IPlug_include_in_plug_hdr.h"
+#include "IPlug_inc_hpp.h"
 #endif
 #ifndef __ICControls_h__
 // same as above
