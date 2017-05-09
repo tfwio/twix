@@ -12,7 +12,7 @@ FOR EXAMPLE IN "IPlugInfo.h" WE HAVE THE FOLLOWING TWO INCLUDES...
 #  pragma message("_IPLUG_INCLUDE_HDR_ from ICControls")
 #  endif
 // JUST IN CASE
-#include "IPlug_include_in_plug_hdr.h"
+#include "IPlug_inc_hpp.h"
 #endif
 
 #ifndef use_iplug
