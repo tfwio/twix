@@ -4,7 +4,7 @@
 // Include this file in the main source for your plugin,
 // after #including the main header for your plugin.
 
-#if defined OS_WIN
+#if defined(OS_WIN)
 HINSTANCE gHInstance = 0;
 #if defined(VST_API) || defined(AAX_API) //TODO check
 #ifdef __MINGW32__
@@ -52,7 +52,14 @@ extern "C"
     }
     return 0;
   }
+#if defined(__MINGW32__) || (_WIN64)
+  // overloading VstPluginMain vs using MS *.def `EXPORT main=VstPluginMain`
+  // works in Orion64, no def needed
+  EXPORT int VstPluginMain(int hostCallback)
+#else
+  // haven't tested other platforms
   EXPORT int main(int hostCallback)
+#endif
   {
 #if defined OS_OSX
     return (VstIntPtr)VSTPluginMain((audioMasterCallback)hostCallback);
