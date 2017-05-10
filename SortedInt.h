@@ -6,6 +6,9 @@ just some modifications to standard vector applying a sort algo.
   - has_value tells you if it has a value calling on get_index
   - add
   - remove
+
+  - eventulally otherwise a memmove type iter
+
 */
 
 #include <vector>
@@ -20,7 +23,6 @@ typedef signed __int32   int32;
 
 //typedef std::vector<signed __int32> int32_v;
 typedef std::vector<int32> int32_v;
-
 
 class SortedInt : public int32_v
 {
@@ -74,8 +76,5 @@ public:
     this->shrink_to_fit();
   }
 };
-
-
-
 
 #endif

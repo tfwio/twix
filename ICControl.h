@@ -2,7 +2,28 @@
 #define __ICControl__
 //#pragma once
 #include "ICControls.h"
+#include "SortedInt.h"
 
+class IControlCollection
+{
+public:
+  IControlCollection(int toggleIdx, int* pColIdx, int count)
+    : collection()
+    , mParamIdx(toggleIdx)
+  {
+    for (int i = 0; i < count; ++i)
+      collection.add(pColIdx[i]);
+  }
+
+  void Update()
+  {
+
+  }
+
+private:
+  int mParamIdx;
+  SortedInt collection;
+};
 
 // Output text to the screen.
 class ITextTimeControl : public ITextControl

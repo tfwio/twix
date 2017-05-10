@@ -7,6 +7,11 @@
 // IRenderHelper
 ////////////////////////////////////////////////////////////////////////////
 
+bool ParamInfo(IParam *pPram, double pMin, double pMax, IParam::EParamType pType);
+bool GetIsAmp(IParam *pPram);
+bool GetIsAmpG(IParam *pPram);
+
+
 // contains some methods that are inherited into IControl controls
 // for rendering a border around the control's boundary, perhaps while
 // under mouse-up, mouse-over or mouse-down conditions.

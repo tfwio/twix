@@ -5,10 +5,10 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>.;$(ADDITIONAL_INCLUDES);../../twix/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(ADDITIONAL_INCLUDES);../../twix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <!-- Alternatively for _DEBUG or something you can -->
       <!-- <PreprocessorDefinitions>use_iplug;show_inclusions;%(PreprocessorDefinitions)</PreprocessorDefinitions> -->
-      <PreprocessorDefinitions>use_iplug;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_CSTD_FUNCTIONAL;use_iplug;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

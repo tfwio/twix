@@ -1,5 +1,15 @@
 #include "ICControls.h"
 
+// abstraction for GetIsAmp and GetIsAmpG
+bool ParamInfo(IParam *pPram, double pMin, double pMax, IParam::EParamType pType)
+{
+  return (pPram->GetMin() == pMin) && (pPram->GetMax() == pMax) && (pPram->Type() == pType);
+}
+// for 0-181 (-40 to 0?) dB amplitude
+bool GetIsAmp(IParam *pPram) { return ParamInfo(pPram, 0, 181, IParam::EParamType::kTypeInt); }
+// for -20 - +20 dB amplitude
+bool GetIsAmpG(IParam *pPram) { return ParamInfo(pPram, -20, 20, IParam::EParamType::kTypeInt); }
+
 ////////////////////////////////////////////////////////////////////////////
 // ICPanelControl
 ////////////////////////////////////////////////////////////////////////////
@@ -23,6 +33,8 @@ void IFloatNumberPanel::OnMouseOver(int x, int y, IMouseMod* pMod) {
   update();
   cd.m_over(x, y);
 }
+
+const double mDrag = 1 / 3;
 
 void IFloatNumberPanel::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod* pMod) {
   cd.m_drag(x, y, &mRECT);
@@ -66,6 +78,7 @@ void IFloatNumberPanel::DrawStringPart(IGraphics *pGraphics, IRECT &r, int col, 
   char str[2];
   str[1] = 0;
   std::string xo = StrUtil::float2str_alt(mValue); // what we draw first
+  mText.mColor = IsGrayed() ? mColorInactive : COLOR_BLACK;
   for (int i = 0; i < xo.length(); i++)
   {
     str[0] = xo.at(i);
@@ -105,44 +118,36 @@ bool IFloatNumberPanel::Draw(IGraphics* pGraphics) {
 ////////////////////////////////////////////////////////////////////////////
 // IKnobText
 ////////////////////////////////////////////////////////////////////////////
-
 bool IKnobText::Draw(IGraphics* pGraphics) {
   
-  bool is_amplitude = (GetParam()->GetMin() == 0) && 
-                      (GetParam()->GetMax() == 181) &&
-                      (GetParam()->Type()   == IParam::EParamType::kTypeInt);
-  bool is_amp_global = (GetParam()->GetMin() == -20) &&
-                       (GetParam()->GetMax() == 20) &&
-                       (GetParam()->Type()   == IParam::EParamType::kTypeInt);
+  IParam *para = GetParam();
+  bool skipText = (para->Type() == IParam::EParamType::kTypeEnum) && mIgnoreEnumText;
 
-  double val = is_amplitude ? 20. * log10(pow(GetParam()->Value(), 2) / 32767.) : GetParam()->Value();
-  // value as double
-  std::string strvalue = std::to_string(val);   // value as string
-
-  // DRAW OUR BITMAP =======================================================
+  double val = GetIsAmp(para) ? 20. * log10(pow(para->Value(), 2) / 32767.) : para->Value();
+  
   int i = BOUNDED(1 + int(0.5 + mValue * (double)(mBitmap.N - 1)), 1, mBitmap.N);
   pGraphics->DrawBitmap(&mBitmap, &mRECT, i, &mBlend); // Draw the knob like a good overloaded class should...
 
-  // NOW DRAW THE OUTLINE CROSSHAIR THINGIES ===============================
   if (showEdgeMarks) DrawCropMarks(pGraphics, mRECT, &COLOR_RED);
-
-  // Continue on to draw the text ==========================================
+  if (skipText) return true;
 
   pGraphics->SetStrictDrawing(false); // ENTER NON-STRICT DRAWING SECTION
-  int intvalue = GetParam()->Int();
+  int intvalue = para->Int();
   char *some = new char[32]; // 32 is max-chars for param displays.
                              // may as well go with that.
   std::string sv;
-  IParam::EParamType t = GetParam()->Type();
+  IParam::EParamType t = para->Type();
 
-  if (t == IParam::EParamType::kTypeInt && is_amplitude)
+  if (t == IParam::EParamType::kTypeInt && GetIsAmp(para))
   {
     if (intvalue == 0) sprintf_s(some, 32, "Mute");
     else sprintf_s(some, 32, "%0.2f dB", val);
+    sv = std::string(some);
   }
-  else if (is_amp_global)
+  else if (GetIsAmpG(para))
   {
     sprintf_s(some, 32, "%0.0f dB", val);
+    sv = std::string(some);
   }
   else if (hasCharNames)
   {
@@ -150,35 +155,17 @@ bool IKnobText::Draw(IGraphics* pGraphics) {
   }
   else switch (t)
   {
-  case IParam::EParamType::kTypeEnum:
-    // sprintf_s(some, 32, "%s", GetParam()->GetDisplayText(intvalue));
-    some = (char*)GetParam()->GetDisplayText(intvalue);
-    sv = some;
-    break;
-  case IParam::EParamType::kTypeInt:
-    sprintf_s(some, 32, "%0.0f", val);
-    sv = some;
-    //sprintf_s(some, 90, mTextFormat, intvalue);
-    break;
-  case IParam::EParamType::kTypeBool:
-    sprintf_s(some, 32, "%0.3f", val);
-    sv = some;
-    //sprintf_s(some, 32, mTextFormat /* "%3.0f"*/, val);
-    //sprintf_s(some, 90, mTextFormat, intvalue);
-    break;
+  case IParam::EParamType::kTypeEnum: some = (char*)para->GetDisplayText(intvalue); sv = some; break;
+  case IParam::EParamType::kTypeInt: sprintf_s(some, 32, "%0.0f", val); sv = some; break;
+  case IParam::EParamType::kTypeBool: sprintf_s(some, 32, "%0.3f", val); sv = some; break;
   case IParam::EParamType::kTypeDouble:
-  default:
-    sprintf_s(some, 32, "%0.1f", val);
-    sv = some;
-    break;
+  default: sprintf_s(some, 32, "%0.1f", val); sv = some; break;
   }
-  //free(some);
-  //delete some;
-  // so we're drawing text which was supplied for an enumeration, or the parameter's text value.
-  pGraphics->DrawIText(&myText, (char*)sv.c_str(), &tRect);
-  //pGraphics->DrawIText(&myText, hasCharNames ? charNames[intvalue] : (char*)strvalue.c_str(), &tRect);
-  pGraphics->SetStrictDrawing(true); // EXIT NON-STRICT DRAWING SECTION
 
+  myText.mColor = IsGrayed() ? mTextDisabled : mTextActive;
+
+  pGraphics->DrawIText(&myText, (char*)sv.c_str(), &tRect);
+  pGraphics->SetStrictDrawing(true); // EXIT NON-STRICT DRAWING SECTION
   return 1;
 }
 

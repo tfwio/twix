@@ -49,8 +49,12 @@ public:
     , mWheelManual(1)
     , mWheelChangeSmall(0.333333)
     , mWheelChangeDefault(1.)
+    , edgeMarkWidth(3)
+    , hasCharNames(0)
+    , mTextActive((*iText).mColor)
+    , mTextDisabled(81, myText.mColor.R, myText.mColor.G, myText.mColor.B)
+    , mIgnoreEnumText(true)
   {
-
     mTargetRECT.B += textH;
     mDisablePrompt = false;
     //mTargetRECT = IRECT(mRECT);
@@ -69,9 +73,11 @@ public:
       SetDirty();
     }
 #endif
-    if ((pMod->S && pMod->R) || (pMod->C && pMod->R)) {
+    if ((GetParam()->Type() == IParam::EParamType::kTypeEnum) && pMod->R)
       PromptUserInput();
-    }
+    else if ((pMod->S && pMod->R) || (pMod->C && pMod->R))
+      PromptUserInput();
+
     // if (pMod->R) {
     //   PromptUserInput();
     // }
@@ -88,6 +94,7 @@ public:
     if (mWheelManual){
       switch (GetParam()->Type())
       {
+      case IParam::EParamType::kTypeEnum:
       case IParam::EParamType::kTypeInt:
         if (pMod->C || pMod->S) mValue += WHEEL_DEPTH_CONTROL * d;
         else mValue = ToNormalizedParam(GetParam()->Int() + (mWheelChangeDefault*d), GetParam()->GetMin(), GetParam()->GetMax(), 1.0);
@@ -120,13 +127,16 @@ public:
     hasCharNames = true;
   }
 
+  void SetIgnoreEnumText(bool ignore) { mIgnoreEnumText = ignore; }
+
 protected:
-  bool    mWheelManual;
+  bool    mWheelManual, mIgnoreEnumText;
+  IColor  mTextActive, mTextDisabled;
   double  mWheelChangeSmall, mWheelChangeDefault;
   char**  charNames; // we have the clear charNames properly weather it is or not set ;(
   int     charNamesCount;
-  bool    hasCharNames = 0;
-  int     edgeMarkWidth = 3;
+  bool    hasCharNames;
+  int     edgeMarkWidth;
   //const char* FilterTypes[pFilterCount];
   int     Width, Height, TextHeight;
   int     mLineHeight;

@@ -58,7 +58,7 @@ protected:
   IntPoint mdown, mdiff, mmove, mmdown, cx;
   int mCharWidth, mDelta;
   IText mText;
-  IColor meme, ColorHot, ColorActive;
+  IColor meme, ColorHot, ColorActive, mColorInactive;
   ColumnDetail cd;
 
   inline void update()
@@ -95,12 +95,14 @@ public:
     , char *tooltip = nullptr // if defined, we set as tooltip
     )
     : IControl  (plug, rect, paramIdx)
-  , ColourFg(255, 0, 0, 0), ColourBg(0, 0, 0, 0)
+    , ColourFg(255, 0, 0, 0)
+    , ColourBg(0, 0, 0, 0)
     , mAdjust(3)
     // -------------------------------------
     , ColorHot   (110, 105,  70)
     , ColorActive(129, 124,  90)
-    , mCharWidth (c_width)
+    , mColorInactive(127, mtext->mColor.R, mtext->mColor.G, mtext->mColor.B)
+    , mCharWidth(c_width)
     , mText      (*mtext)
     , meme       (255, 48, 48, 48)
     , mDelta     (0)

@@ -17,44 +17,84 @@ namespace on { namespace fs {
     namespace fx = std::tr2::sys;
     fx::path directory(fpath);
     fx::directory_iterator iter(directory), ifiles(directory), end;
-    std::cout << std::endl << "dirs" << std::endl;
+    if (use_console) std::cout << std::endl << "dirs" << std::endl;
     for (; iter != end; ++iter)
     {
       if (!fx::is_directory(iter->path())) continue;
       FileNames.push_back(iter->path().filename().c_str());
-      std::cout << "  - " << FileNames.at(FileNames.size() - 1).c_str() << std::endl;
+      if (use_console) std::cout << "  - " << FileNames.at(FileNames.size() - 1).c_str() << std::endl;
     }
-    std::cout << std::endl << "file" << std::endl;
+    if (use_console) std::cout << std::endl << "file" << std::endl;
     for (; ifiles != end; ++ifiles)
       //  if (iter->path().extension() == ".txt")
     {
       if (!fx::is_regular_file(ifiles->path())) continue;
       FileNames.push_back(ifiles->path().filename().c_str());
-      std::cout << "  - " << FileNames.at(FileNames.size() - 1).c_str() << std::endl;
+      if (use_console) std::cout << "  - " << FileNames.at(FileNames.size() - 1).c_str() << std::endl;
     }
   }
-  static std::string get_pathinfo(std::string fpath, std::string ext, std::vector<std::string> &DirNames, std::vector<std::string> &FileNames) {
+  static std::string get_pathinfo(std::string fpath, std::string ext, std::vector<std::string> &DirNames, std::vector<std::string> &FileNames, bool force_extension = true) {
     namespace fx = std::tr2::sys;
     fx::path directory(fpath);
     fx::directory_iterator end;
 
-    std::cout << std::endl << "dir:" << std::endl;
+    if (use_console) std::cout << std::endl << "dir:" << std::endl;
+
     for (fx::directory_iterator iter(directory); iter != end; ++iter)
     {
       if (!fx::is_directory(iter->path())) continue;
-      std::string s = iter->path().filename();
+      std::string s = iter->path().string();
       DirNames.push_back(s);
-      std::cout << "  - " << s.c_str() << std::endl;
+      if (use_console) std::cout << "  - " << s.c_str() << std::endl;
     }
-    std::cout << std::endl << "file" << std::endl;
+    if (use_console) std::cout << std::endl << "file" << std::endl;
     for (fx::directory_iterator ifiles(directory); ifiles != end; ++ifiles)
-      if (ifiles->path().extension() == ext)
+      if ((ifiles->path().extension() == ext) && force_extension)
       {
         if (!fx::is_regular_file(ifiles->path())) continue;
-        std::string s = ifiles->path().filename();
+        std::string s = ifiles->path().string();
         FileNames.push_back(s);
-        std::cout << "  - " << s.c_str() << std::endl;
+        if (use_console) std::cout << "  - " << s.c_str() << std::endl;
       }
+      else if (!force_extension)
+      {
+        if (!fx::is_regular_file(ifiles->path())) continue;
+        std::string s = ifiles->path().string();
+        FileNames.push_back(s);
+        if (use_console) std::cout << "  - " << s.c_str() << std::endl;
+      }
+    return "";
+  }
+  static std::string get_pathinfo_p(std::string fpath, std::string ext, std::vector<std::string> *DirNames, std::vector<std::string> *FileNames, bool force_extension = true) {
+    namespace fx = std::tr2::sys;
+    fx::path directory(fpath);
+    fx::directory_iterator end;
+
+    if (use_console) std::cout << std::endl << "dir:" << std::endl;
+    if (DirNames) for (fx::directory_iterator iter(directory); iter != end; ++iter)
+    {
+      if (!fx::is_directory(iter->path())) continue;
+      std::string s = iter->path().string();
+      (*DirNames).push_back(s);
+      if (use_console) std::cout << "  - " << s.c_str() << std::endl;
+    }
+    if (use_console) std::cout << std::endl << "file" << std::endl;
+    if (FileNames) for (fx::directory_iterator ifiles(directory); ifiles != end; ++ifiles)
+      if ((ifiles->path().extension() == ext) && force_extension)
+      {
+        if (!fx::is_regular_file(ifiles->path())) continue;
+        std::string s = ifiles->path().string();
+        (*FileNames).push_back(s);
+        if (use_console) std::cout << "  - " << s.c_str() << std::endl;
+      }
+      else if (!force_extension)
+      {
+        if (!fx::is_regular_file(ifiles->path())) continue;
+        std::string s = ifiles->path().string();
+        (*FileNames).push_back(s);
+        if (use_console) std::cout << "  - " << s.c_str() << std::endl;
+      }
+    return "";
   }
 
   static bool get_filename(std::string file) {
