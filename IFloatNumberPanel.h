@@ -114,7 +114,8 @@ public:
     , cd(rect.L, mCharWidth)
   {
     this->mTooltip = WDL_String(tooltip);
-
+    mDisablePrompt = false;
+    this->SetTextEntryLength(12);
   }
 
   #pragma region GetWRect(void) TopLeft(void) SetCursorPos(IntPoint) FIXME: MAC MAC MAC
@@ -137,8 +138,36 @@ public:
     ::SetCursorPos(px.X, px.Y);
   }
 
+  void OnMouseOut() override
+  {
+    cd.clear();
+    SetDirty(false);
+    Redraw();
+  }
   #pragma endregion
 
+  void PromptUserInput() override
+  {
+    if (mParamIdx >= 0 && !mDisablePrompt)
+    {
+      if (mPlug->GetParam(mParamIdx)->GetNDisplayTexts()) // popup menu
+      {
+        mPlug->GetGUI()->PromptUserInput(this, mPlug->GetParam(mParamIdx), &mRECT);
+      }
+      else // text entry
+      {
+        int cX = (int)mRECT.MW();
+        int cY = (int)mRECT.MH();
+        int halfW = int(float(mRECT.W()) / 2.f);
+        int halfH = int(float(16) / 2.f);
+
+        IRECT txtRECT = IRECT(cX - halfW, cY - halfH, cX + halfW, cY + halfH);
+        mPlug->GetGUI()->PromptUserInput(this, mPlug->GetParam(mParamIdx), &txtRECT);
+      }
+
+      Redraw();
+    }
+  }
   virtual void OnMouseOver(int x, int y, IMouseMod* pMod) override;
   virtual void OnMouseDown(int x, int y, IMouseMod* pMod) override;
   virtual void OnMouseWheel(int x, int y, IMouseMod* pMod, int d) override;
