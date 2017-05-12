@@ -34,6 +34,9 @@ private:
     // [3-5]
     mMenuRoot.AddItem("Load Program...");
     mMenuRoot.AddItem("Load Bank...");
+
+    #if defined(__DrumSynthPlug__)
+
     mMenuRoot.AddSeparator();
     // [6-7]
     mMenuRoot.AddItem("Load DsPreset...");
@@ -42,7 +45,8 @@ private:
     mMenuRoot.AddItem("Library-Location");
     dir_menu(mLibraryPath.Get());
     child = mMenuRoot.AddItem("Library", 9, &mMenuDir);
-
+    
+    #endif
   }
 
   // Createe directory structure in local `IPopupMenu mDir`
