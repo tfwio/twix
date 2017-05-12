@@ -12,6 +12,7 @@ just some modifications to standard vector applying a sort algo.
 */
 
 #include <vector>
+// contains sort methodology
 #include <algorithm>
 
 #ifndef _hasint32_
@@ -30,6 +31,7 @@ static bool sort_me(int a, int b) { return (a < b); }
 public:
   SortedInt() : int32_v(0){}
   SortedInt(int count) : int32_v(count){}
+  SortedInt(std::initializer_list<int> &list) : int32_v(list) {}
   ~SortedInt() {}
 
   /**
