@@ -38,13 +38,29 @@ const double mDrag = 1 / 3;
 
 void IFloatNumberPanel::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod* pMod) {
   cd.m_drag(x, y, &mRECT);
-  SetCursorPos(cd.last_mouseMove());
+  IntPoint a, b, c;
+  cd.PointInfo(a, b, c);
+  SetCursorPos(b);
+  //if (abs(dY) < 2.25) return;
+#ifdef EXTRA
+  WDL_String me;
+  me.SetFormatted(32,"%s — %d %d",GetParam()->GetNameForHost(),dX,dY);
+  this->SetTooltip(me.Get());
+  ((IGraphicsWin*)GetGUI())->ShowTooltip();
+#endif
   // this following 2 lines is for the new parameter type and happens to be wrong.
   // double result = (cd.index1d() * 100) + cd.value();
   // mValue = result; // 
   update();
   mValue = value() + cd.value(); // 
+  #if 1
+  WDL_String me;
+  me.SetFormatted(32, "%s — %d", GetParam()->GetNameForHost(), c.Y);
+  this->SetTooltip(me.Get());
+  ((IGraphicsWin*)GetGUI())->ShowTooltip();
+  #endif
   // -- begin non-automation value change --
+  mValue = CONTAIN(mValue, 0., 999999.99999);
   GetParam()->Set(mValue);
   mPlug->OnParamChange(mParamIdx);
   mPlug->InformHostOfParamChange(mParamIdx, mValue);
@@ -55,11 +71,14 @@ void IFloatNumberPanel::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod* pMo
 }
 
 void IFloatNumberPanel::OnMouseUp(int x, int y, IMouseMod* pMod) {
+  GetGUI()->ShowMouseCursor();
   cd.m_up(x, y);
   //ow_msg();
 }
 
 void IFloatNumberPanel::OnMouseDown(int x, int y, IMouseMod* pMod) {
+  GetGUI()->HideMouseCursor();
+  IControl::OnMouseDown(x,y,pMod);
   update();
   cd.m_down(x, y);
 }
@@ -74,17 +93,21 @@ void IFloatNumberPanel::OnMouseWheel(int x, int y, IMouseMod* pMod, int d) {
   SetDirty(false);
 }
 
+
+const IColor mbg(255, 218, 217, 197), abg(255, 218, 217, 197), hitme(255, 248, 255, 250);
 void IFloatNumberPanel::DrawStringPart(IGraphics *pGraphics, IRECT &r, int col, int hot) {
   char str[2];
   str[1] = 0;
   std::string xo = StrUtil::float2str_alt(mValue); // what we draw first
   mText.mColor = IsGrayed() ? mColorInactive : COLOR_BLACK;
+  //pGraphics->FillRoundRect(&mbg, &mRECT, &mBlend, 2, 1);
+  //pGraphics->RoundRect(&abg, &mRECT, &mBlend, 2, 1);
   for (int i = 0; i < xo.length(); i++)
   {
     str[0] = xo.at(i);
-    // if (i == col) pGraphics->FillIRect(&ColorActive, &r);
-    // else if (i == hot) pGraphics->FillIRect(&ColorHot, &r);
-    // else pGraphics->FillIRect(&meme, &r);
+    if (i == col) pGraphics->FillIRect(&hitme, &r);
+    //else if (i == hot) pGraphics->FillIRect(&ColorHot, &r);
+    //else pGraphics->FillIRect(&meme, &r);
     pGraphics->DrawIText(&mText, str, &r);
     r.MoveX(mCharWidth + 1);
   }
@@ -97,6 +120,7 @@ bool IFloatNumberPanel::Draw(IGraphics* pGraphics) {
   r.SetWidthHeight(mCharWidth, mRECT.H());
   // 
   // pGraphics->SetStrictDrawing(false);
+  
   DrawStringPart(pGraphics, r, int(cd.index1()), int(cd.index2()));
   //    // 
   //    r.MoveTo(mRECT.L, r.B + 4);
