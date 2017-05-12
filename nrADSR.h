@@ -71,6 +71,7 @@ public:
       }
       break;
     }
+    ++offset;
     return output;
   }
   //Number process(int sampleCount);
@@ -88,7 +89,10 @@ public:
   }
   //Number getOutput(void);
   Number getOutput() { return output; }
+  
   //int getState(void);
+
+  // get gate state.
   int getState() { return state; }
   // same as inline; hack
   envState getStateT(void) { return envState(getState()); }
@@ -96,6 +100,8 @@ public:
   void gateT(envState pState) { gate(pState); }
 
   //void gate(int on);
+
+  // sets the state.
   void gate(int gate) {
     if (gate==1)
       state = env_attack;
@@ -110,10 +116,15 @@ public:
   void setTargetRatioDR(Number targetRatio);
   //void reset(void);
   void reset() {
-    state = env_idle;
+    state = 0;
     output = 0.0;
+    offset = 0;
   }
 
+  long long unsigned int getOffset()
+  {
+    return offset;
+  }
 protected:
   int state;
   Number output;
@@ -131,6 +142,7 @@ protected:
   Number releaseBase;
   string name;
   Number calcCoef(Number rate, Number targetRatio);
+  long long unsigned int offset;
 
 };
 
