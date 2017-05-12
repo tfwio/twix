@@ -67,6 +67,13 @@ protected:
 public:
   inline IntPoint last_mouseMove() { return mm; }
 
+  void PointInfo(IntPoint &last, IntPoint &current, IntPoint &diff)
+  {
+    last = IntPoint(md);
+    current = mm;
+    diff = IntPoint(md-mm);
+  }
+
   bool IsDown() { return mIsDown; }
 
   int getL() { return L; }
@@ -253,7 +260,10 @@ public:
     update(a.X, b.X, limit);
     A = ydir(a,b);
   }
-
+  void clear()
+  {
+    C1 = -1;
+  }
   //int compare() { return A; }
   
   // /param l is the left position of the control;
