@@ -82,6 +82,29 @@ public:
     //   PromptUserInput();
     // }
   }
+  void OnMouseDrag(int x, int y, int dX, int dY, IMouseMod* pMod) override
+  {
+    double gearing = mGearing;
+
+#ifdef PROTOOLS
+#ifdef OS_WIN
+    if (pMod->C) gearing *= 10.0;
+#else
+    if (pMod->R) gearing *= 10.0;
+#endif
+#else
+    if (pMod->C || pMod->S) gearing *= 10.0;
+#endif
+
+    if (GetParam()->Type()!=IParam::EParamType::kTypeEnum) mValue += (mDirection == kVertical) ?
+      (double)dY / (double)(mRECT.T - mRECT.B) / gearing :
+      (double)dX / (double)(mRECT.R - mRECT.L) / gearing;
+    else mValue -= (mDirection == kVertical) ?
+      (double)dY / (double)(mRECT.T - mRECT.B) / gearing :
+      (double)dX / (double)(mRECT.R - mRECT.L) / gearing;
+
+    SetDirty();
+  }
   void OnMouseWheel(int x, int y, IMouseMod* pMod, int d) override
   {
 //#ifdef PROTOOLS
@@ -95,6 +118,9 @@ public:
       switch (GetParam()->Type())
       {
       case IParam::EParamType::kTypeEnum:
+        if (pMod->C || pMod->S) mValue += WHEEL_DEPTH_CONTROL * d;
+        else mValue = ToNormalizedParam(GetParam()->Int() - (mWheelChangeDefault*d), GetParam()->GetMin(), GetParam()->GetMax(), 1.0);
+        break;
       case IParam::EParamType::kTypeInt:
         if (pMod->C || pMod->S) mValue += WHEEL_DEPTH_CONTROL * d;
         else mValue = ToNormalizedParam(GetParam()->Int() + (mWheelChangeDefault*d), GetParam()->GetMin(), GetParam()->GetMax(), 1.0);
