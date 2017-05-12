@@ -9,24 +9,26 @@
 #define NN_MINMAX(note) ((note < 0) ? NN_UNDEFINED_MIN : (note > 127 ? NN_UNDEFINED_MAX : note))
 
 class MidiNode {
+
 public:
-  MidiNode() : Channel(0), Amplitude(0), NoteNumber(-1), CurrentNoteOffset(0), Status(0)  {}
-  MidiNode(int ch, int nn, int amp, int stat, int offset)
+  MidiNode() : Channel(0), Amplitude(0), NoteNumber(-1), CurrentNoteOffset(0), Status(0), mBufferOffset(0)  {}
+  MidiNode(int ch, int nn, int amp, int stat, int offset, int buffer_offset=0)
   {
     Channel           = int8(ch);
     Amplitude         = int8(amp);
     NoteNumber        = int8(nn);
     CurrentNoteOffset = int8(offset);
     Status            = int8(stat);
+    mBufferOffset     = int(buffer_offset);
   }
-
-  MidiNode(IMidiMsg *nMsg, int mod = 0)
+  explicit MidiNode(IMidiMsg *nMsg, int mod = 0)
   {
     Channel           = int8(nMsg->Channel());
     Amplitude         = int8(nMsg->Velocity());
     NoteNumber        = int8(nMsg->NoteNumber());
     CurrentNoteOffset = int8(mod);
     Status            = int8(nMsg->StatusMsg());
+    mBufferOffset     = int(nMsg->mOffset);
   }
 
   int GetNoteMod_Unchecked() { return int(NoteNumber) + int(CurrentNoteOffset); }
@@ -36,12 +38,71 @@ public:
   int GetAmp() { return int(Amplitude); }
   int GetNote() { return int(NoteNumber); }
   int GetChannel() { return int(Channel); }
+  int GetOffset() { return int(CurrentNoteOffset); }
+  int GetBufferOffset() { return int(CurrentNoteOffset); }
 
 private:
+  int  mBufferOffset;
   int8 NoteNumber, Amplitude, CurrentNoteOffset, Status, Channel;
 };
 
 typedef std::vector<MidiNode> NoteVector;
+
+namespace outside {
+  //typedef WDL_PtrList_DeleteOnDestroy<MidiNode*> MidiNodeList;
+  typedef WDL_PtrList<MidiNode> MidiNodePtrList;
+};
+class MidiNodeList : public outside::MidiNodePtrList
+{
+
+public:
+
+  MidiNodeList() : outside::MidiNodePtrList(48) {}
+  ~MidiNodeList() { /*outside::MidiNodePtrList::~MidiNodePtrList();*/ } // is this innard necessary?
+
+  int FindNoteIndex(int note)
+  {
+    MidiNode **list = GetList();
+    int i = 0;
+    while (i < this->GetSize())
+    {
+      if (list[i]->GetNote() == note) return i;
+      i++;
+    }
+    return -1;
+  }
+  int FindOffsetIndex(int note)
+  {
+    MidiNode **list = GetList();
+    int i = 0;
+    while (i < this->GetSize())
+    {
+      if (list[i]->GetBufferOffset() == note) return i;
+      i++;
+    }
+    return -1;
+  }
+  
+  MidiNode *AddSortNote(MidiNode *pNode)
+  {
+    return outside::MidiNodePtrList::InsertSorted(pNode, sort_note);
+  }
+  MidiNode *AddSortOffset(MidiNode *pNode)
+  {
+    return outside::MidiNodePtrList::InsertSorted(pNode, sort_offs);
+  }
+  
+  static int sort_note(const MidiNode **pA, const MidiNode **pB)
+  {
+    int a = (((MidiNode*)*pA)->GetNote()), b = ((MidiNode*)*pB)->GetNote();
+    return (a == b) ? 0 : (a < b ? -1 : 1);
+  }
+  static int sort_offs(const MidiNode **pA, const MidiNode **pB)
+  {
+    int a = (((MidiNode*)*pA)->GetBufferOffset()), b = ((MidiNode*)*pB)->GetBufferOffset();
+    return (a == b) ? 0 : (a < b ? -1 : 1);
+  }
+};
 
 class SortedNotes : public NoteVector
 {
